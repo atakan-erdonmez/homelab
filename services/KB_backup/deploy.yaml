@@ -1,0 +1,37 @@
+---
+- name: Backup Knowledge Base repo 
+  hosts: vps
+  become: yes
+  
+  tasks: 
+    - name: Check VPS backup directory exists and correct permissions
+      ansible.builtin.file:
+        path: "/var/backups/knowledge_base"
+        state: directory
+        owner: atakan
+        group: atakan
+        mode: '0755'
+
+    - name: Check script directory exists and correct permissions
+      ansible.builtin.file:
+        path: "/opt/services/kb_backup"
+        state: directory
+        owner: atakan
+        group: atakan
+        mode: '0755'
+
+    - name: Push backup script to VPS
+      ansible.builtin.copy:
+        src: "./kb_backup.py"
+        dest: "/opt/services/kb_backup"
+        owner: atakan
+        group: atakan
+        mode: '0755'
+       
+    - name: Schedule the cron job
+      ansible.builtin.cron:
+        name: "Daily KB Backup"
+        minute: "0"
+        hour: "3"
+        user: "atakan"
+        job: "/usr/bin/python3 /opt/services/kb_backup/kb_backup.py" 
