@@ -1,0 +1,30 @@
+---
+### Solve the power issue of Pi
+- name: Stabilize System Logs and Hardware
+  hosts: rasp
+  become: yes
+  vars:
+    ssd_adapter_id: "13fd:5912"
+  tasks:
+    - name: Enable journald folder
+      file:
+        path: /var/log/journal
+        state: directory
+        owner: root
+        group: systemd-journal
+        mode: '2755' 
+
+    - name: Set journald storage to persistent
+      lineinfile:
+        path: /etc/systemd/journald.conf
+        regexp: '^#?Storage='
+        line: Storage=persistent
+        state: present 
+    
+    - name: Use older but stable USB drivel, add USB quirk to cmdline.txt
+      lineinfile:
+        path: /boot/firmware/cmdline.txt
+        backrefs: yes
+        regexp: '^(?!.*usb-storage\.quirks={{ ssd_adapter_id }}:u)(.*)$'
+        line: 'usb-storage.quirks={{ ssd_adapter_id }}:u \1'
+
