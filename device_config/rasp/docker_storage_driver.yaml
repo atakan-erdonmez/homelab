@@ -1,0 +1,14 @@
+---
+- name: Force modern overlay2 driver to use for Docker instead of overlayfs
+  hosts: rasp
+  tasks:
+    - name: Create the necessary file
+      copy: 
+        dest: /etc/docker/daemon.json
+        content: |
+          {
+            "storage-driver": "overlay2"
+          }
+        owner: root
+        group: root
+        mode: '0644'
