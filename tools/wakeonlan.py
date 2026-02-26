@@ -3,9 +3,9 @@ import os
 # --- CONFIGURATION ---
 # Format: "Device Name": "MAC_ADDRESS"
 DEVICES = {
-    "Optiplex1": "AA:BB:CC:DD:EE:FF",
-    "Optiplex2": "11:22:33:44:55:66",
-    "NAS": "00:11:22:33:44:55"
+    "Optiplex1": "48:4D:7E:EC:E8:9B",
+    "Optiplex2": "48:4D:7E:EC:E4:CE",
+    "NAS": "00:08:9B:EA:3D:CD"
 }
 
 def main():
