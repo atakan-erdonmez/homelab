@@ -1,0 +1,34 @@
+services:
+  guacd:
+    image: guacamole/guacd:1.6.0
+    container_name: guacd
+    restart: always
+
+  guacamole:
+    image: guacamole/guacamole:1.6.0
+    container_name: guacamole
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      GUACD_HOSTNAME: guacd
+      MYSQL_HOSTNAME: mariadb
+      MYSQL_DATABASE: guacamole_db
+      MYSQL_USERNAME: guacamole_user
+      MYSQL_PASSWORD: ${GUAC_PW}
+    depends_on:
+      - guacd
+      - mariadb
+
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${GUAC_PW} # Using one password for everything
+      MYSQL_DATABASE: guacamole_db
+      MYSQL_USER: guacamole_user
+      MYSQL_PASSWORD: ${GUAC_PW}
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+      - ./init:/docker-entrypoint-initdb.d
