@@ -1,0 +1,56 @@
+---
+- name: Configure Wake-on-LAN for Raspberry Pi
+  hosts: rasp
+  become: yes
+  tasks:
+    - name: Install ethtool
+      apt:
+        name: ethtool
+        state: present
+        update_cache: yes
+
+    - name: Enable WoL in Pi EEPROM configuration
+      lineinfile:
+        path: /etc/default/rpi-eeprom-update
+        regexp: '^{{ item.key }}='
+        line: '{{ item.key }}={{ item.value }}'
+      loop:
+        - { key: 'POWER_OFF_ON_HALT', value: '1' }
+        - { key: 'WAKE_ON_LAN', value: '1' }
+      notify: Update EEPROM
+
+    - name: Create Systemd service for WoL persistence
+      copy:
+        dest: /etc/systemd/system/wol.service
+        content: |
+          [Unit]
+          Description=Configure Wake-on-LAN
+          After=network-online.target
+          Wants=network-online.target
+
+          [Service]
+          Type=oneshot
+          ExecStart=/usr/sbin/ethtool -s eth0 wol g
+          RemainAfterExit=yes
+
+          [Install]
+          WantedBy=multi-user.target
+
+    - name: Force systemd to reload configs
+      systemd:
+        daemon_reload: yes
+
+    - name: Enable WoL service (persistent on boot)
+      systemd:
+        name: wol.service
+        enabled: yes
+
+    - name: Start WoL service (apply now)
+      systemd:
+        name: wol.service
+        state: started
+      ignore_errors: yes # Sometimes ethtool triggers a non-zero exit if already set
+
+  handlers:
+    - name: Update EEPROM
+      shell: rpi-eeprom-config --apply /etc/default/rpi-eeprom-update
