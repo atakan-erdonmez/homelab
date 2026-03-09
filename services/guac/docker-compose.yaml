@@ -17,18 +17,26 @@ services:
       MYSQL_USERNAME: guacamole_user
       MYSQL_PASSWORD: ${GUAC_PW}
     depends_on:
-      - guacd
-      - mariadb
+      mariadb:
+        condition: service_healthy  # Waits for the MariaDB healthcheck to pass
+
+
 
   mariadb:
-    image: mariadb:latest
+    image: mariadb:11  # Pinned version for stability
     container_name: mariadb
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${GUAC_PW} # Using one password for everything
+      MYSQL_ROOT_PASSWORD: ${GUAC_PW}
       MYSQL_DATABASE: guacamole_db
       MYSQL_USER: guacamole_user
       MYSQL_PASSWORD: ${GUAC_PW}
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     volumes:
       - ./mysql_data:/var/lib/mysql
       - ./init:/docker-entrypoint-initdb.d
