@@ -27,8 +27,21 @@ I built this to see if it could be a "universal gateway" for my homelab manageme
 **The Verdict:** Guacamole is great for RDP and SSH, but it’s not a web proxy. Since most of my lab (Proxmox, etc.) uses web GUIs, I’ve moved those over to Nginx. I'm keeping this repo as a reference for whenever I need a dedicated RDP/SSH jump-box.
 
 # Quick Start
-1- Define your inventory in ansible/inventory.ini
+1- **Prerequisites:** Install the required Ansible collection
+`ansible-galaxy collection install community.docker`
 
-2- Put your database password in .env
+2- **Setup:** Define your inventory in `ansible/inventory.ini` and put your database password in `.env`.
 
-3- Execute `ansible-playbook -i your_inventory.ini deploy.yaml`
+3- **Deploy**:
+`ansible-playbook -i your_inventory.ini deploy.yaml`
+
+### Accessing the UI
+Once deployed, the interface is at:
+`http://<your_ip>:8080/guacamole
+
+**Note:** You must include the `/guacamole/` suffix, otherwise the server will return 404
+
+### Default Credentials
+Username: guacadmin
+Password: guacadmin
+(Be sure to change these immediately after your first login!)
