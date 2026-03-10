@@ -28,5 +28,7 @@ I built this to see if it could be a "universal gateway" for my homelab manageme
 
 # Quick Start
 1- Define your inventory in ansible/inventory.ini
+
 2- Put your database password in .env
+
 3- Execute `ansible-playbook -i your_inventory.ini deploy.yaml`
