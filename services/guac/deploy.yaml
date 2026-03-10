@@ -22,13 +22,13 @@
         dest: "{{ base_dir }}/.env"
         mode: '0600' # Keeps the password file private
 
-    - name: Copy local docker-compose.yaml to the Pi
+    - name: Copy local docker-compose.yaml to the destination
       copy:
         src: "./docker-compose.yaml"
         dest: "{{ base_dir }}/docker-compose.yaml"
         mode: '0644'
 
-    - name: Generate SQL init script (only if missing on Pi)
+    - name: Generate SQL init script (only if missing on destination)
       shell: >
         docker run --rm --platform linux/arm64 guacamole/guacamole:1.6.0 
         /opt/guacamole/bin/initdb.sh --mysql > {{ base_dir }}/init/init.sql

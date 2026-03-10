@@ -31,7 +31,9 @@ services:
       MYSQL_DATABASE: guacamole_db
       MYSQL_USER: guacamole_user
       MYSQL_PASSWORD: ${GUAC_PW}
-    healthcheck:
+    
+    # Make an healthcheck to ensure database is on before starting
+    healthcheck:  
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 5s
       timeout: 3s
