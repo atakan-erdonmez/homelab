@@ -43,5 +43,7 @@ Once deployed, the interface is at:
 
 ### Default Credentials
 Username: guacadmin
+
 Password: guacadmin
+
 (Be sure to change these immediately after your first login!)
