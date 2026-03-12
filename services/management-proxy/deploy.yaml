@@ -1,0 +1,31 @@
+---
+- name: Deploy and configure Nginx Reverse Proxy for remote access to my homelab
+  hosts: rasp
+  become: true
+  vars:
+    base_dir: "/opt/services/management-proxy"
+
+  tasks:
+    - name: Ensure directories exist
+      file: 
+        path: "{{ base_dir }}" 
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: Copy Nginx Configuraiton
+      copy:
+        src: ./nginx.conf
+        dest: "{{ base_dir }}/nginx.conf"
+        mode: '0644'
+    
+    - name: Copy Docker Compose file
+      copy:
+        src: ./docker-compose.yaml
+        dest: "{{ base_dir }}/docker-compose.yaml"
+
+    - name: Pull and start the Docker containers
+      community.docker.docker_compose_v2:
+        project_src: "{{ base_dir }}"
+        state: present
