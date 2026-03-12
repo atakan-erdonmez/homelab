@@ -2,6 +2,41 @@
 This is a reverse proxy solution to access my homelab remotely & securely over the internet. 
 
 # ⚙️ Architecture & Design
+```mermaid
+graph LR
+    %% External Entity
+    User((fa:fa-user User)) -- "HTTPS" --> CF
+
+    subgraph CF_EDGE ["<font size='5'><br/>☁️ Cloudflare Edge</font>"]
+        direction TB
+        CF{fa:fa-shield WAF / DNS} --> Auth[fa:fa-lock Access MFA]
+        Auth --> Tunnel_Edge[fa:fa-route Tunnel Endpoint]
+    end
+
+    subgraph RPI ["<font size='5'><br/>🧠 Raspberry Pi</font>"]
+        direction TB
+        CT[fa:fa-shuttle-space cloudflared] --> Nginx[fa:fa-server Nginx Proxy]
+    end
+
+    subgraph LAN ["<font size='5'>🖥️ Local Network</font>"]
+        direction TB
+        Nginx ==> |pve1-lab| PVE[fa:fa-desktop Proxmox]
+        Nginx ==> |nas-lab| NAS[fa:fa-database NAS]
+    end
+
+    %% Connections
+    Tunnel_Edge -.-> |"Encrypted Tunnel"| CT
+
+    %% Styling for Subgraph Headers
+    style CF_EDGE fill:#fdf6e3,stroke:#eee8d5,color:#586e75,stroke-width:2px
+    style RPI fill:#e1f5fe,stroke:#01579b,color:#01579b,stroke-width:2px
+    style LAN fill:#f1f8e9,stroke:#33691e,color:#33691e,stroke-width:2px
+    
+    %% Internal Node Styling
+    style Auth fill:#fff,stroke:#d32f2f,stroke-width:2px
+    style Nginx fill:#fff,stroke:#0277bd,stroke-width:2px
+```
+
 ## Core Components
 - **Nginx:** Used for reverse proxy. It directs requests to the relevant destinations.
 - **Cloudflare Tunnel:** Since my homelab is behind CGNAT (no static IP), I used Cloudflare tunnel to open my Gateway (Raspberry Pi) to the Internet with a public endpoint.
