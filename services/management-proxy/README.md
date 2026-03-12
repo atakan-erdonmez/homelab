@@ -15,7 +15,7 @@ Since these live outside of Git, they are documented here for reproducibility:
 
 
 ## Design Decisions
-- **Flattened Subdomains: **Used service-lab.domain instead of service.lab.domain to remain compatible with Cloudflare's free-tier Universal SSL (which only supports 1 level of subdomains).
+- **Flattened Subdomains:** Used service-lab.domain instead of service.lab.domain to remain compatible with Cloudflare's free-tier Universal SSL (which only supports 1 level of subdomains).
 - **Nginx "Blackhole":** A default_server block is implemented to drop any unmapped traffic with a 404, preventing internal service leakage.
 - **WebSocket Passthrough:** Custom headers are applied to support VNC and shell consoles in Proxmox.
 - **Networking:** Used `network_mode: host` in Compose to allow Nginx direct access to gateway device's network interface
