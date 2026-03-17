@@ -64,7 +64,7 @@ To further harden this deployment, the following features are planned:
 - **HSTS & Security Headers:** Implementation of Strict-Transport-Security and X-Frame-Options within Nginx to mitigate man-in-the-middle and clickjacking risks.
 - **Cloudflare WARP**: Integration of Cloudflare WARP to ensure only managed devices can access the gateway.
 
-# 🚀 Quick Start
+# ⚡ Quick Start
 1. Update `nginx.conf` file according to your endpoints
 2. Deploy to your desired endpoint with:
     `ansible-playbook deploy.yaml`
