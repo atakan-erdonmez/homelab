@@ -44,9 +44,10 @@ graph LR
 
 ## Cloudflare Config
 Since these live outside of Git, they are documented here for reproducibility:
-1. Used existing Cloudflared tunnel as management proxy
-2. Conigured public hostnames (published application routes) on Cloudflare to route traffic to Nginx on port 8080.
+1. Created a Cloudflared container for tunnel
+2. Conigured public hostnames (published application routes) on Cloudflare to route traffic to Nginx on port 8080 using the tunnel.
 3. Created Access Control policy, forcing using MFA on all existing subdomains
+4. Used Geo-blocking and rate-limiting for increased security
 
 
 ## Design Decisions
@@ -59,10 +60,10 @@ Since these live outside of Git, they are documented here for reproducibility:
 Having direct access to lowest level of my homelab is useful while working remotely. However, for security wise, it might be best to disable all subdomains that are not used often.
 
 ## Roadmap
-To further harden this deployment, the following features are planned:
-- **Geo-Blocking (WAF):** Restrict access specifically to local IP ranges to reduce the attack surface.
-- **HSTS & Security Headers:** Implementation of Strict-Transport-Security and X-Frame-Options within Nginx to mitigate man-in-the-middle and clickjacking risks.
-- **Cloudflare WARP**: Integration of Cloudflare WARP to ensure only managed devices can access the gateway.
+To further harden this deployment, the following features are ~~planned~~ done:
+- ~~**Geo-Blocking (WAF):** Restrict access specifically to local IP ranges to reduce the attack surface.~~
+- ~~**HSTS & Security Headers:** Implementation of Strict-Transport-Security and X-Frame-Options within Nginx to mitigate man-in-the-middle and clickjacking risks.~~
+- ~~**Cloudflare WARP**: Integration of Cloudflare WARP to ensure only managed devices can access the gateway.~~
 
 # ⚡ Quick Start
 1. Update `nginx.conf` file according to your endpoints
