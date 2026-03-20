@@ -45,7 +45,7 @@ graph LR
 ## Cloudflare Config
 Since these live outside of Git, they are documented here for reproducibility:
 1. Created a Cloudflared container for tunnel
-2. Conigured public hostnames (published application routes) on Cloudflare to route traffic to Nginx on port 8080 using the tunnel.
+2. Conigured public hostnames (published application routes) on Cloudflare to route traffic to Nginx on port 8080 using the tunnel
 3. Created Access Control policy, forcing using MFA on all existing subdomains
 4. Used Geo-blocking and rate-limiting for increased security
 
