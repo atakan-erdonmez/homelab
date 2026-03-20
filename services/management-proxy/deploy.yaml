@@ -20,6 +20,18 @@
         dest: "{{ base_dir }}/nginx.conf"
         mode: '0644'
     
+    - name: Copy Production Environment file
+      copy:
+        src: ./.env
+        dest: "{{ base_dir }}/.env"
+        mode: '0600' # Strict permissions for the actual token
+
+    - name: Copy Environment Example file
+      copy:
+        src: ./.env.example
+        dest: "{{ base_dir }}/.env.example"
+        mode: '0644'
+      
     - name: Copy Docker Compose file
       copy:
         src: ./docker-compose.yaml

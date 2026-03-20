@@ -1,8 +1,17 @@
 services:
-  management-proxy:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
+    network_mode: host
+
+  nginx-proxy:
     image: nginx:alpine
-    container_name: management-proxy
+    container_name: nginx-proxy
     network_mode: host
     restart: unless-stopped
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro 
+    depends_on:
+      - cloudflared
