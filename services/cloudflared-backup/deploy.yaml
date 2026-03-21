@@ -1,9 +1,12 @@
 ---
-- name: Deploy and configure Nginx Reverse Proxy for remote access to my homelab
+- name: Deploy secondary cloudflared tunnel for high availability
+  # When I add a new service to the nginx config, I re-deploy with ansible.
+  # Since it restarts both containers, including cloudflared, if something is wrong with nginx config, tunnel will go down.
+  # To prevent this, I am using this tunnel to have uninterrupted access
   hosts: rasp
   become: true
   vars:
-    base_dir: "/opt/services/management-proxy"
+    base_dir: "/opt/services/cloudflared-backup"
 
   tasks:
     - name: Ensure directories exist
@@ -14,11 +17,6 @@
         owner: root
         group: root
 
-    - name: Copy Nginx Configuraiton
-      copy:
-        src: ./nginx.conf
-        dest: "{{ base_dir }}/nginx.conf"
-        mode: '0644'
     
     - name: Copy Production Environment file
       copy:
@@ -26,16 +24,11 @@
         dest: "{{ base_dir }}/.env"
         mode: '0600' # Strict permissions for the actual token
 
-    - name: Copy Environment Example file
-      copy:
-        src: ./.env.example
-        dest: "{{ base_dir }}/.env.example"
-        mode: '0644'
-      
+
     - name: Copy Docker Compose file
       copy:
-        src: ./docker-compose.yaml
-        dest: "{{ base_dir }}/docker-compose.yaml"
+        src: ./compose.yaml
+        dest: "{{ base_dir }}/compose.yaml"
 
     - name: Pull and start the Docker containers
       community.docker.docker_compose_v2:

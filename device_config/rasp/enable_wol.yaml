@@ -1,4 +1,5 @@
 ---
+## Note: This doesn't work on Raspberry Pi 4B. I don't need this functionality and don't use it.
 - name: Configure Wake-on-LAN for Raspberry Pi
   hosts: rasp
   become: yes
