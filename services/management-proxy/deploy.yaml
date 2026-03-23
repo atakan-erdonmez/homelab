@@ -42,3 +42,4 @@
         project_src: "{{ base_dir }}"
         state: present
         pull: always
+        recreate: always
