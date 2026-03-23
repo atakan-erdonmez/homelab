@@ -38,7 +38,7 @@ http {
     # 2. Proxmox 1
     server {
         listen 8080;
-        server_name pve01-lab.atakan-erdonmez.com;
+        server_name pve01-lab.nexonet.space;
 
         location / {
             proxy_pass https://192.168.10.101:8006;
@@ -53,7 +53,7 @@ http {
     # 2. Proxmox 2
     server {
         listen 8080;
-        server_name pve02-lab.atakan-erdonmez.com;
+        server_name pve02-lab.nexonet.space;
 
         location / {
             proxy_pass https://192.168.10.102:8006;
@@ -66,21 +66,20 @@ http {
     }
 
     # 3. MIKROTIK ROUTER
+    server {
+        listen 8080;
+        server_name router-lab.nexonet.space;
 
-#    server {
-#        listen 8080;
-#       server_name router-lab.atakan-erdonmez.com;
-#
-#       location / {
-#            proxy_pass http://192.168.10.1;
-#            proxy_set_header Host $host;
-#        }
-#    }
+        location / {
+            proxy_pass http://192.168.10.1;
+            proxy_set_header Host $host;
+        }
+    }
 
     # 4. QNAP NAS
     server {
         listen 8080;
-        server_name nas-lab.atakan-erdonmez.com;
+        server_name nas-lab.nexonet.space;
 
         location / {
             proxy_pass http://192.168.10.103:8080;
@@ -93,7 +92,7 @@ http {
     # Kavita
     server {
         listen 8080;
-        server_name kavita.atakan-erdonmez.com;
+        server_name kavita.nexonet.space;
 
         location / {
             proxy_pass http://192.168.20.50:5000;
