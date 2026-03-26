@@ -21,8 +21,29 @@
     state: present
     update_cache: yes
 
+- name: Ensure Cloudflared systemd override directory exists
+  file:
+    path: /etc/systemd/system/cloudflared.service.d
+    state: directory
+
+- name: Configure Cloudflared Auto-Restart Policy
+  copy:
+    dest: /etc/systemd/system/cloudflared.service.d/override.conf
+    content: |
+      [Service]
+      Restart=always
+      RestartSec=5s
+      StartLimitIntervalSec=0
+  notify: Reload systemd daemon
+
 - name: Install cloudflared service
   command: "cloudflared service install {{ cloudflared_token }}"
   args:
     creates: /etc/systemd/system/cloudflared.service
   notify: Restart cloudflared
+
+- name: Ensure Cloudflared is started and enabled
+  service:
+    name: cloudflared
+    state: started
+    enabled: yes
