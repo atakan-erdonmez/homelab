@@ -1,0 +1,39 @@
+- name: Install Nginx Prerequisites
+  apt:
+    name: [curl, gnupg2, ca-certificates, lsb-release, debian-archive-keyring]
+    state: present
+
+- name: Download Nginx GPG key
+  get_url:
+    url: https://nginx.org/keys/nginx_signing.key
+    dest: /usr/share/keyrings/nginx_signing.key
+    mode: '0644'
+
+- name: Dearmor Nginx GPG key
+  shell: "cat /usr/share/keyrings/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null"
+  args:
+    creates: /usr/share/keyrings/nginx-archive-keyring.gpg
+
+- name: Add Nginx repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian {{ ansible_distribution_release }} nginx"
+    filename: nginx
+
+- name: Install nginx
+  apt:
+    name: nginx
+    state: present
+
+- name: Sync Universal Nginx Templates
+  template:
+    src: templates/proxy.conf.j2
+    dest: "/etc/nginx/conf.d/{{ item.name }}.conf"
+  loop: "{{ services }}"
+  notify: Reload nginx
+
+- name: Ensure services are started
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop: [nginx, cloudflared]

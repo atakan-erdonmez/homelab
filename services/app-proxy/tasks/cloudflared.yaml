@@ -1,0 +1,28 @@
+- name: Ensure keyrings directory exists
+  file:
+    path: /usr/share/keyrings
+    state: directory
+    mode: '0755'
+
+- name: Download Cloudflare GPG key
+  get_url:
+    url: https://pkg.cloudflare.com/cloudflare-public-v2.gpg
+    dest: /usr/share/keyrings/cloudflare-public-v2.gpg
+    mode: '0644'
+
+- name: Add Cloudflared repository
+  apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/cloudflare-public-v2.gpg] https://pkg.cloudflare.com/cloudflared any main"
+    filename: cloudflared
+
+- name: Install cloudflared
+  apt:
+    name: cloudflared
+    state: present
+    update_cache: yes
+
+- name: Install cloudflared service
+  command: "cloudflared service install {{ cloudflared_token }}"
+  args:
+    creates: /etc/systemd/system/cloudflared.service
+  notify: Restart cloudflared
