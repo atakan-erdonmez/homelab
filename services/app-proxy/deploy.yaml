@@ -1,0 +1,91 @@
+---
+- name: Configure App-Proxy with Cloudflared and Nginx
+  hosts: gateway
+  become: true
+  vars:
+    # Use ansible-vault to encrypt this in production
+    cloudflared_token: "{{ lookup('env', 'CLOUDFLARED_TOKEN') }}"
+
+  tasks:
+    - name: Ensure keyrings directory exists
+      file:
+        path: /usr/share/keyrings
+        state: directory
+        mode: '0755'
+
+    - name: Install prerequisite packages
+      apt:
+        name:
+          - curl
+          - gnupg2
+          - ca-certificates
+          - lsb-release
+          - debian-archive-keyring
+        state: present
+        update_cache: yes
+
+    # --- Cloudflare Setup ---
+
+    - name: Download Cloudflare GPG key
+      get_url:
+        url: https://pkg.cloudflare.com/cloudflare-public-v2.gpg
+        dest: /usr/share/keyrings/cloudflare-public-v2.gpg
+        mode: '0644'
+
+    - name: Add Cloudflared repository
+      apt_repository:
+        repo: "deb [signed-by=/usr/share/keyrings/cloudflare-public-v2.gpg] https://pkg.cloudflare.com/cloudflared any main"
+        state: present
+        filename: cloudflared
+
+    - name: Install cloudflared
+      apt:
+        name: cloudflared
+        state: present
+        update_cache: yes
+
+    - name: Install cloudflared service
+      command: "cloudflared service install {{ cloudflared_token }}"
+      args:
+        creates: /etc/systemd/system/cloudflared.service
+      notify: Restart cloudflared
+
+    # --- Nginx Setup ---
+
+    - name: Download Nginx GPG key
+      get_url:
+        url: https://nginx.org/keys/nginx_signing.key
+        dest: /tmp/nginx_signing.key
+
+    - name: Dearmor Nginx GPG key
+      shell: "cat /tmp/nginx_signing.key | gpg --dearmor | tee /usr/share/keyrings/nginx-archive-keyring.gpg >/dev/null"
+      args:
+        creates: /usr/share/keyrings/nginx-archive-keyring.gpg
+
+    - name: Add Nginx repository
+      apt_repository:
+        # Note: ansible_distribution_release automatically detects 'bookworm', 'bullseye', etc.
+        repo: "deb [signed-by=/usr/share/keyrings/nginx-archive-keyring.gpg] https://nginx.org/packages/debian {{ ansible_distribution_release }} nginx"
+        state: present
+        filename: nginx
+
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Ensure services are started and enabled
+      service:
+        name: "{{ item }}"
+        state: started
+        enabled: yes
+      loop:
+        - nginx
+        - cloudflared
+
+  handlers:
+    - name: Restart cloudflared
+      service:
+        name: cloudflared
+        state: restarted
