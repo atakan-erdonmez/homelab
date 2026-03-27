@@ -5,4 +5,4 @@
 
 ## Specific files
 tools/devices.json
-inventory.ini
+ansible/inventory.ini
