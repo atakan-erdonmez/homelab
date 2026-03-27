@@ -1,3 +1,7 @@
 .env
+*.env
 *.pem
 *.key
+
+## Specific files
+tools/devices.json
