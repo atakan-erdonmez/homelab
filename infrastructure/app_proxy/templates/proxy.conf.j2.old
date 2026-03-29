@@ -1,0 +1,24 @@
+# Managed by Ansible - Changes will be overwritten
+server {
+    listen 8080;
+    server_name {{ item.domain }};
+
+    client_max_body_size 50M;
+
+    location / {
+        proxy_pass http://{{ item.ip }}:{{ item.port }};
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        {% if item.ws | default(false) %}
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        {% endif %}
+
+        proxy_read_timeout 3600s;
+        proxy_buffering off;
+    }
+}
