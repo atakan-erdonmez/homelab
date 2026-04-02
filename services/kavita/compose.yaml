@@ -5,9 +5,9 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Etc/UTC
+      - TZ=Europe/Istanbul
     volumes:
-      - /opt/services/kavita/config:/kavita/config
+      - /opt/services/kavita/config:/config
       - /opt/services/kavita/data:/data
     ports:
       - 5000:5000

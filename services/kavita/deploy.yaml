@@ -3,10 +3,21 @@
   hosts: debiandocker
   become: true
   vars:
-    - base_dir: /opt/services/kavita/
+    base_dir: "/opt/services/kavita"
+    nfs_server: "192.168.10.103"
+    nfs_path: "/services/kavita"
+    mount_point: "/mnt/services/kavita"
 
   tasks:
-    - name: Check if directory exists
+    - name: Install NFS client dependencies
+      apt:
+        name:
+          - nfs-common
+          - rpcbind
+        state: present
+        update_cache: yes
+
+    - name: Ensure local service directories exist
       file:
         path: "{{ item }}"
         state: directory
@@ -15,8 +26,17 @@
         group: atakan
       loop:
         - "{{ base_dir }}"
-        - "{{ base_dir}}/config"
+        - "{{ base_dir }}/config"
         - "{{ base_dir }}/data"
+
+
+    - name: Configure NFS mount in fstab and mount it
+      mount:
+        path: "{{ mount_point }}"
+        src: "{{ nfs_server }}:{{ nfs_path }}"
+        fstype: nfs
+        opts: "nfsvers=4.1,defaults,_netdev,noatime,timeo=600,retrans=2"
+        state: mounted
 
     - name: Copy Docker Compose
       copy:
@@ -31,4 +51,3 @@
         project_src: "{{ base_dir }}"
         state: present
         pull: always
-
