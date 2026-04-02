@@ -6,3 +6,9 @@ services:
     ip: 192.168.20.55
     port: 5678
     websockets: true
+
+  - name: kavita
+    domain: kavita.atakan-erdonmez.com
+    ip: 192.168.20.50
+    port: 5000
+    websockets: yes
