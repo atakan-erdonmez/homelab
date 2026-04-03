@@ -6,3 +6,4 @@
 ## Specific files
 tools/devices.json
 ansible/inventory.ini
+ansible/group_vars/all/secrets.yaml

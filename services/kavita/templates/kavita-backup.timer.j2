@@ -1,0 +1,13 @@
+[Unit]
+Description=Run Kavita Backup daily at 2am
+
+[Timer]
+# Run every day at 2:00 AM
+OnCalendar=*-*-* 02:00:00
+# If the server was off at 2am, run immediately upon boot
+Persistent=true
+# Randomize the start slightly (up to 5 mins) to prevent resource spikes
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

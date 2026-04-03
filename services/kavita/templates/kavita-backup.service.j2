@@ -1,0 +1,16 @@
+[Unit]
+Description=Kavita Restic Backup Service
+# Ensure the network and the specific NFS mount are ready
+After=network-online.target mnt-services-kavita.mount
+Requires=mnt-services-kavita.mount
+
+[Service]
+Type=oneshot
+# Run as root to ensure we have read access to all docker volumes
+User=root
+ExecStart={{ backup_script_path }}
+# Safety check: don't start if the repo directory isn't visible
+ExecStartPre=/usr/bin/test -d {{ restic_repo }}
+
+[Install]
+WantedBy=multi-user.target
