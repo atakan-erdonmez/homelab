@@ -12,7 +12,7 @@
 
     restic_repo: "{{ mount_point }}/repo"
     backup_script_path: "/usr/local/bin/kavita-backup.sh"
-    # have a place to store scripts
+
     restic_password: "{{ kavita_restic_backup_pw }}"
 
 
