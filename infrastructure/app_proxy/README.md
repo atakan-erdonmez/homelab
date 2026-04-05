@@ -4,10 +4,46 @@ A secure reverse-proxy for accessing locally hosted services and apps over Inter
 
 
 # ⚙️ Architecture & Design
-
 This solution is hosted within a dedicated Proxmox LXC container (Debian). It consists of a native installation of the Cloudflared tunnel and an Nginx reverse proxy.
 
 The gateway is designed according to the Separation of Concerns (SoC) principle, isolating stable infrastructure (the tunnel) from dynamic application-level routing.
+
+```mermaid
+graph LR
+    %% External Entity
+    User((fa:fa-user User)) -- "HTTPS" --> CF
+
+    subgraph CF_EDGE ["<font size='5'><br/>☁️ Cloudflare Edge</font>"]
+        direction TB
+        CF{fa:fa-shield WAF / DNS} --> Auth[fa:fa-lock Access MFA]
+        Auth --> Tunnel_Edge[fa:fa-route Tunnel Endpoint]
+    end
+
+    subgraph RPI ["<font size='5'><br/>LXC Container</font>"]
+        direction TB
+        CT[fa:fa-shuttle-space cloudflared] --> Nginx[fa:fa-server Nginx Proxy]
+    end
+
+    subgraph LAN ["<font size='5'>🖥️ Local Network</font>"]
+        direction TB
+        Nginx ==> |website| PVE[fa:fa-desktop Web Server]
+        Nginx ==> |media| NAS[fa:fa-database Media Server]
+    end
+
+    %% Connections
+    Tunnel_Edge -.-> |"Service Tunnel"| CT
+
+    %% Styling for Subgraph Headers
+    style CF_EDGE fill:#fdf6e3,stroke:#eee8d5,color:#586e75,stroke-width:2px
+    style RPI fill:#e1f5fe,stroke:#01579b,color:#01579b,stroke-width:2px
+    style LAN fill:#f1f8e9,stroke:#33691e,color:#33691e,stroke-width:2px
+    
+    %% Internal Node Styling
+    style Auth fill:#fff,stroke:#d32f2f,stroke-width:2px
+    style Nginx fill:#fff,stroke:#0277bd,stroke-width:2px
+```
+
+
 
 ## Core Components
 

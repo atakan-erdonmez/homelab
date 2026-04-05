@@ -25,7 +25,7 @@ graph LR
     end
 
     %% Connections
-    Tunnel_Edge -.-> |"Encrypted Tunnel"| CT
+    Tunnel_Edge -.-> |"Management Tunnel"| CT
 
     %% Styling for Subgraph Headers
     style CF_EDGE fill:#fdf6e3,stroke:#eee8d5,color:#586e75,stroke-width:2px
