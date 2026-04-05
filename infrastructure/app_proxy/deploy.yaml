@@ -1,6 +1,6 @@
 ---
 - name: Deploy App-Proxy Gateway
-  hosts: gateway
+  hosts: app_proxy
   become: true
   vars_files:
     - vars/services.yaml
@@ -12,9 +12,13 @@
       import_tasks: tasks/cloudflared.yaml
       tags: infra
 
-    - name: Run Nginx Configuration Tasks
-      import_tasks: tasks/nginx.yaml
-      tags: proxy
+    - name: Install Nginx
+      import_tasks: tasks/nginx_install.yaml
+      tags: nginx_install
+
+    - name: Update & run Nginx proxy
+      import_tasks: tasks/nginx_proxy.yaml
+      tags: nginx_proxy
 
   handlers:
     - name: Restart cloudflared

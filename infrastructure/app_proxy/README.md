@@ -43,6 +43,10 @@ The gateway is designed according to the Separation of Concerns (SoC) principle,
 - Access is enforced at the edge using Cloudflare Zero Trust (MFA required).
 - WAF, rate limiting, and geo-restrictions are applied at the Cloudflare layer.
 
+## Roadmap
+
+- Implement a strategy to clean up old Nginx config files for services that are not in production anymore.
+
 # ⚡ Quick Start
 
 To execute the full deployment from a clean state:
@@ -51,6 +55,8 @@ To execute the full deployment from a clean state:
 ### Granular Updates (Using Tags)
 To optimize deployment time, use tags to target specific layers of the stack:
 
-Update Proxy/Routing only: `ansible-playbook deploy.yaml --tags proxy`
+Update Nginx installation only: `ansible-playbook deploy.yaml --tags nginx_install`
+
+Update Nginx config & proxy only: `ansible-playbook deploy.yaml --tags nginx_proxy`
 
 Provision Cloudflare only: `ansible-playbook deploy.yaml --tags infra`
