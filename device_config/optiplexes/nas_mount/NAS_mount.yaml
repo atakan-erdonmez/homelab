@@ -1,0 +1,59 @@
+---
+- name: Configure Proxmox Directory Storage via NAS Mount
+  hosts: optiplex1
+  become: true
+  vars:
+    nas_ip: "192.168.10.103"
+    nas_export: "/infrastructure/proxmox"
+    mount_path: "/mnt/nas-proxmox"
+    storage_id: "nas-proxmox"
+
+  tasks:
+    - name: Ensure NFS client tools are installed
+      apt:
+        name: nfs-common
+        state: present
+        update_cache: yes
+
+    - name: Create local mount point directory
+      file:
+        path: "{{ mount_path }}"
+        state: directory
+        mode: '0755'
+
+    - name: Configure /etc/fstab and mount NAS
+      ansible.posix.mount:
+        src: "{{ nas_ip }}:{{ nas_export }}"
+        path: "{{ mount_path }}"
+        fstype: nfs
+        opts: "nfsvers=4.0,hard,_netdev,noatime,timeo=600,retrans=10"
+        state: mounted
+
+    - name: Check if Proxmox storage ID exists
+      command: "pvesm status --storage {{ storage_id }}"
+      register: storage_check
+      failed_when: false
+      changed_when: false
+
+    - name: Add Directory storage to Proxmox
+      # This creates the 'dir: nas-proxmox' entry in storage.cfg
+      command: >
+        pvesm add dir {{ storage_id }} 
+        --path {{ mount_path }} 
+        --content backup,images,rootdir,vztmpl,iso
+      when: storage_check.rc != 0
+
+    - name: Update storage properties and retention
+      # Ensures the config matches your exact prune requirements
+      command: >
+        pvesm set {{ storage_id }} 
+        --content backup,images,rootdir,vztmpl,iso 
+        --prune-backups keep-last=5
+      when: storage_check.rc == 0
+
+    - name: Prevent I/O errors by setting local vzdump temp directory
+      lineinfile:
+        path: /etc/vzdump.conf
+        regexp: '^#?tmpdir:'
+        line: 'tmpdir: /var/tmp'
+        state: present
