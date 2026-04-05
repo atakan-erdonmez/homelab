@@ -64,6 +64,8 @@ To further harden this deployment, the following features are ~~planned~~ done:
 - ~~**Geo-Blocking (WAF):** Restrict access specifically to local IP ranges to reduce the attack surface.~~
 - ~~**HSTS & Security Headers:** Implementation of Strict-Transport-Security and X-Frame-Options within Nginx to mitigate man-in-the-middle and clickjacking risks.~~
 - ~~**Cloudflare WARP**: Integration of Cloudflare WARP to ensure only managed devices can access the gateway.~~
+- Eliminate script and use Ansible. 
+- Use templating for nginx configurations
 
 # ⚡ Quick Start
 1. Update `nginx.conf` file according to your endpoints
