@@ -12,3 +12,9 @@ services:
     ip: 192.168.20.50
     port: 5000
     websockets: yes
+
+  - name: freshrss
+    domain: rss.atakan-erdonmez.com
+    ip: 192.168.20.50
+    port: 1234
+    websockets: no

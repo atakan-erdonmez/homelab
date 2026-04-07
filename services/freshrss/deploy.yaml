@@ -1,0 +1,40 @@
+---
+- name: Deploy FreshRSS on DebianDocker VM using Docker
+  hosts: debiandocker
+  become: true
+  vars:
+    base_dir: "/opt/services/freshrss"
+  
+  tasks:
+    - name: Ensure the service directory exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: root
+        group: www-data
+        mode: '0755'
+      
+      loop:
+        - "{{ base_dir }}"
+        - "{{ base_dir }}/data"
+        - "{{ base_dir }}/extensions"
+
+
+    - name: Copy Docker Compose manifest
+      copy:
+        src: "./compose.yaml"
+        dest: "{{ base_dir }}/compose.yaml"
+        mode: '0644'
+
+
+    - name: Copy local .env file to the destination
+      copy:
+        src: "./.env"
+        dest: "{{ base_dir }}/.env"
+        mode: '0600' # Keeps the password file private
+
+
+    - name: Pull and start the Docker containers
+      community.docker.docker_compose_v2:
+        project_src: "{{ base_dir }}"
+        state: present
