@@ -6,7 +6,6 @@
     base_dir: "/opt/services/freshrss"
     restic_cache_dir: "/var/cache/restic/freshrss"
     
-
   ## NFS Vars
     nfs_server: "192.168.10.103"
     nfs_path: "/services/freshrss"
@@ -20,6 +19,7 @@
   vars_files:
     - "group_vars/all/secrets.yaml"
   
+
   tasks:
     - name: Ensure the service directory exist
       file:
@@ -33,14 +33,11 @@
         - "{{ base_dir }}/data"
         - "{{ base_dir }}/extensions"
 
-
-    - name: Ensure Restic local cache directory exists
-      file:
-        path: "{{ restic_cache_dir }}"
-        state: directory
-        owner: root
-        group: root
-        mode: '0700'
+    - name: Copy local .env file to the destination
+      copy:
+        src: "./.env"
+        dest: "{{ base_dir }}/.env"
+        mode: '0600' # Keeps the password file private
 
     - name: Copy Docker Compose manifest
       copy:
@@ -49,28 +46,13 @@
         mode: '0644'
 
 
-    - name: Copy local .env file to the destination
-      copy:
-        src: "./.env"
-        dest: "{{ base_dir }}/.env"
-        mode: '0600' # Keeps the password file private
-
-
     - name: Pull and start the Docker containers
       community.docker.docker_compose_v2:
         project_src: "{{ base_dir }}"
         state: present
 
+  
   ## NFS
-    - name: Configure NFS mount in fstab and mount it
-      mount:
-        path: "{{ mount_point }}"
-        src: "{{ nfs_server }}:{{ nfs_path }}"
-        fstype: nfs
-        opts: "nfsvers=4.0,defaults,_netdev,noatime,timeo=600,retrans=5,x-systemd.automount,x-systemd.idle-timeout=600"
-        state: mounted
-
-
     - name: Install NFS client dependencies
       apt:
         name:
@@ -78,6 +60,16 @@
           - rpcbind
         state: present
         update_cache: yes
+
+    
+
+    - name: Configure NFS mount in fstab and mount it
+      mount:
+        path: "{{ mount_point }}"
+        src: "{{ nfs_server }}:{{ nfs_path }}"
+        fstype: nfs
+        opts: "nfsvers=4.0,defaults,_netdev,noatime,timeo=600,retrans=5,x-systemd.automount,x-systemd.idle-timeout=600"
+        state: mounted
 
   ## Restic Backup
 
@@ -91,6 +83,13 @@
         path: "{{ restic_repo }}"
         state: directory
 
+    - name: Ensure Restic local cache directory exists
+      file:
+        path: "{{ restic_cache_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
 
     - name: Check if Restic repo is already initialized
       stat:
