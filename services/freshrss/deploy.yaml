@@ -4,6 +4,21 @@
   become: true
   vars:
     base_dir: "/opt/services/freshrss"
+    restic_cache_dir: "/var/cache/restic/freshrss"
+    
+
+  ## NFS Vars
+    nfs_server: "192.168.10.103"
+    nfs_path: "/services/freshrss"
+    mount_point: "/mnt/services/freshrss"
+
+  ## Backup Vars
+    restic_repo: "{{ mount_point }}/repo"
+    backup_script_path: "/usr/local/bin/freshrss-backup.sh"
+    restic_password: "{{ freshrss_restic_backup_pw }}"
+
+  vars_files:
+    - "group_vars/all/secrets.yaml"
   
   tasks:
     - name: Ensure the service directory exist
@@ -13,12 +28,19 @@
         owner: root
         group: www-data
         mode: '0755'
-      
       loop:
         - "{{ base_dir }}"
         - "{{ base_dir }}/data"
         - "{{ base_dir }}/extensions"
 
+
+    - name: Ensure Restic local cache directory exists
+      file:
+        path: "{{ restic_cache_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
 
     - name: Copy Docker Compose manifest
       copy:
@@ -38,3 +60,71 @@
       community.docker.docker_compose_v2:
         project_src: "{{ base_dir }}"
         state: present
+
+  ## NFS
+    - name: Configure NFS mount in fstab and mount it
+      mount:
+        path: "{{ mount_point }}"
+        src: "{{ nfs_server }}:{{ nfs_path }}"
+        fstype: nfs
+        opts: "nfsvers=4.0,defaults,_netdev,noatime,timeo=600,retrans=5,x-systemd.automount,x-systemd.idle-timeout=600"
+        state: mounted
+
+
+    - name: Install NFS client dependencies
+      apt:
+        name:
+          - nfs-common
+          - rpcbind
+        state: present
+        update_cache: yes
+
+  ## Restic Backup
+
+    - name: Install Restic
+      apt:
+        name: restic
+        state: present
+
+    - name: Ensure Restic repo directory exists on NAS
+      file:
+        path: "{{ restic_repo }}"
+        state: directory
+
+
+    - name: Check if Restic repo is already initialized
+      stat:
+        path: "{{ restic_repo }}/config"
+      register: restic_repo_check
+
+    - name: Initialize Restic repository if needed
+      command: "restic -r {{ restic_repo }} init"
+      environment:
+        RESTIC_PASSWORD: "{{ restic_password }}"
+      when: not restic_repo_check.stat.exists
+
+    - name: Deploy backup script from template
+      template:
+        src: templates/freshrss-backup.sh.j2
+        dest: "{{ backup_script_path }}"
+        owner: root
+        group: root
+        mode: '0700'
+      no_log: true
+
+    - name: Deploy systemd backup service from template
+      template:
+        src: templates/freshrss-backup.service.j2
+        dest: /etc/systemd/system/freshrss-backup.service
+
+    - name: Deploy systemd backup timer from template
+      template:
+        src: templates/freshrss-backup.timer.j2
+        dest: /etc/systemd/system/freshrss-backup.timer
+
+    - name: Ensure backup timer is enabled and running
+      systemd:
+        name: freshrss-backup.timer
+        enabled: yes
+        state: started
+        daemon_reload: yes

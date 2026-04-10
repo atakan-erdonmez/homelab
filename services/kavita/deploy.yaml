@@ -6,10 +6,14 @@
     - "group_vars/all/secrets.yaml"
   vars:
     base_dir: "/opt/services/kavita"
+
+  ## NFS
     nfs_server: "192.168.10.103"
     nfs_path: "/services/kavita"
     mount_point: "/mnt/services/kavita"
 
+  ## Restic Repo
+    restic_cache_dir: "/var/cache/restic/kavita"
     restic_repo: "{{ mount_point }}/repo"
     backup_script_path: "/usr/local/bin/kavita-backup.sh"
 
@@ -38,6 +42,13 @@
         - "{{ base_dir }}/config"
         - "{{ base_dir }}/data"
 
+    - name: Ensure Restic local cache directory exists
+      file:
+        path: "{{ restic_cache_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0700'
 
     - name: Configure NFS mount in fstab and mount it
       mount:
