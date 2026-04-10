@@ -54,24 +54,22 @@ ansible-playbook deploy.yaml
 
 ### Management
 
-**Logs**
+**Logs**: `docker logs -f freshrss`
 
-```
-docker logs -f freshrss
-```
+**Restart**: `docker compose -f /opt/services/freshrss/compose.yaml restart`
 
-**Restart**
+**Update**: `docker compose -f /opt/services/freshrss/compose.yaml pull && docker compose -f /opt/services/freshrss/compose.yaml up -d`
 
-```
-docker compose -f /opt/services/freshrss/compose.yaml restart
-```
 
-**Update**
+### Backups
+**Manual Backup Trigger:** `sudo /usr/local/bin/freshrss-backup.sh`
 
-```
-docker compose -f /opt/services/freshrss/compose.yaml pull
-docker compose -f /opt/services/freshrss/compose.yaml up -d
-```
+**Check Backup History:** `sudo -E bash -c 'source /usr/local/bin/freshrss-backup.sh && restic snapshots'`
+
+**Monitor Automation Logs:** `sudo journalctl -u freshrss-backup.service -f`
+
+**Verify Timer Schedule:** `systemctl status freshrss-backup.timer`
+
 
 ---
 
