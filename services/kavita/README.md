@@ -59,7 +59,7 @@ homelab/
     
 - **Root Squash Compatibility**: The deployment logic accounts for NFS `root_squash` settings, ensuring directory existence without failing on permission-restricted `chown` operations.
     
-- **Encrypted Offsite-Ready Data**: Restic snapshots are encrypted at rest on the NAS, making them safe for potential future syncing to a public cloud (S3/B2).
+- **Encrypted Offsite-Ready Data**: Restic snapshots are encrypted at rest on the NAS, making them safe for potential future syncing to a public cloud.
     
 
 # ⚡ Quick Start
