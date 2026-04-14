@@ -1,0 +1,13 @@
+---
+backup_service_name: "{{ base_dir | basename }}"
+
+restic_cache_dir: "/var/cache/restic/{{ backup_service_name }}"
+restic_repo: "{{ mount_point }}/repo"
+backup_script_path: "/usr/local/bin/{{ backup_service_name }}-backup.sh"
+
+backup_retention_daily: 7
+backup_on_calendar: "*-*-* 02:00:00"
+backup_randomized_delay_sec: 600
+
+backup_nfs_mount_opts: "nfsvers=4.0,defaults,_netdev,noatime,timeo=600,retrans=5,x-systemd.automount,x-systemd.idle-timeout=600"
+backup_run_user: "root"

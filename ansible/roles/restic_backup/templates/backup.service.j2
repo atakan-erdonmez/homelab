@@ -1,0 +1,13 @@
+[Unit]
+Description={{ backup_service_name }} Restic Backup Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User={{ backup_run_user }}
+ExecStart={{ backup_script_path }}
+ExecStartPre=/usr/bin/test -d {{ restic_repo }}
+
+[Install]
+WantedBy=multi-user.target
