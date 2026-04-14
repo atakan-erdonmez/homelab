@@ -1,0 +1,78 @@
+---
+- name: Prepare NAS backup (until rclone setup)
+  hosts: backup01
+  become: true
+
+  vars:
+    nfs_mounts:
+      - src: "192.168.10.103:/services"
+        path: "/mnt/backup/services"
+      - src: "192.168.10.103:/infrastructure"
+        path: "/mnt/backup/infrastructure"
+
+    restic_cache_dir: "/var/cache/restic/nas"
+    restic_password_file: "/etc/restic/password"
+    backup_retention_daily: 7
+    
+    backup_nfs_mount_opts: "nfsvers=4.0,_netdev,noatime,hard,timeo=600,retrans=5,x-systemd.automount,x-systemd.idle-timeout=600"
+
+
+  tasks:
+    - name: Install NFS client
+      apt:
+        name:
+          - nfs-common
+          - rpcbind
+        state: present
+        update_cache: yes
+
+    - name: Create mount point directories
+      file:
+        path: "{{ item.path }}"
+        state: directory
+      loop: "{{ nfs_mounts }}"
+
+    - name: Configure and mount NFS entries
+      mount:
+        path: "{{ item.path }}"
+        src: "{{ item.src }}"
+        fstype: nfs
+        opts: "{{ backup_nfs_mount_opts }}"
+        state: mounted
+      loop: "{{ nfs_mounts }}"
+
+    - name: Install Restic
+      apt:
+        name: restic
+        state: present
+
+    - name: Install Rclone
+      apt:
+        name: rclone
+        state: present
+
+    - name: Create restic cache directory
+      file:
+        path: "{{ restic_cache_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
+
+    - name: Check restic password file exists
+      stat:
+        path: "{{ restic_password_file }}"
+      register: restic_password_file_check
+
+    - name: Fail if restic password file is missing
+      fail:
+        msg: "Restic password file {{ restic_password_file }} does not exist. Create it manually before continuing."
+      when: not restic_password_file_check.stat.exists
+
+    - name: Ensure root rclone config directory exists
+      file:
+        path: /root/.config/rclone
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
