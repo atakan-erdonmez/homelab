@@ -30,11 +30,18 @@
       failed_when: false
       changed_when: false
 
-    - name: Initialize Restic repository if needed
+    - name: Initialize Restic repository if missing
       command: restic -r {{ restic_repo }} init
       environment:
         RESTIC_PASSWORD_FILE: "{{ restic_password_file }}"
-      when: restic_repo_check.rc != 0
+      when: "'repository does not exist' in restic_repo_check.stderr"
+
+    - name: Fail if restic repo error is not “not initialized”
+      fail:
+        msg: "Restic repo check failed: {{ restic_repo_check.stderr }}"
+      when:
+        - restic_repo_check.rc != 0
+        - "'repository does not exist' not in restic_repo_check.stderr"
 
     - name: Verify restic repository is reachable
       command: restic -r {{ restic_repo }} snapshots
