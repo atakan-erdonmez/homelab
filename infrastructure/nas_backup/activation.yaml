@@ -1,0 +1,52 @@
+---
+- name: Activate NAS to Google Drive backup
+  hosts: backup01
+  become: true
+
+  vars:
+    backup_service_name: "nas-to-gdrive"
+    restic_repo: "rclone:gdrive:Backup/nas_backup/repo"
+    restic_password_file: "/etc/restic/password"
+    rclone_config_file: "/root/.config/rclone/rclone.conf"
+
+  tasks:
+    - name: Check root rclone config exists
+      stat:
+        path: "{{ rclone_config_file }}"
+      register: rclone_config_check
+
+    - name: Fail if root rclone config is missing
+      fail:
+        msg: "Root rclone config {{ rclone_config_file }} does not exist. Run rclone config and copy it to root before activation."
+      when: not rclone_config_check.stat.exists
+
+
+### Restic repo
+    - name: Check whether restic repo is reachable
+      command: restic -r {{ restic_repo }} snapshots
+      environment:
+        RESTIC_PASSWORD_FILE: "{{ restic_password_file }}"
+      register: restic_repo_check
+      failed_when: false
+      changed_when: false
+
+    - name: Initialize Restic repository if needed
+      command: restic -r {{ restic_repo }} init
+      environment:
+        RESTIC_PASSWORD_FILE: "{{ restic_password_file }}"
+      when: restic_repo_check.rc != 0
+
+    - name: Verify restic repository is reachable
+      command: restic -r {{ restic_repo }} snapshots
+      environment:
+        RESTIC_PASSWORD_FILE: "{{ restic_password_file }}"
+      changed_when: false
+###
+
+
+    - name: Enable and start backup timer
+      systemd:
+        name: "{{ backup_service_name }}-backup.timer"
+        enabled: true
+        state: started
+        daemon_reload: true

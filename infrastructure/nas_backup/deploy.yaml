@@ -4,17 +4,30 @@
   become: true
 
   vars:
+    base_dir: "/mnt/backup/"
+    backup_service_name: "nas-to-gdrive"
+    restic_repo: "rclone:gdrive:Backup/nas_backup/repo"
+    restic_password: "{{ gdrive_rclone_restic_backup_pw }}"
+  ## NFS Related
+    backup_nfs_mount_opts: "nfsvers=4.0,_netdev,noatime,hard,timeo=600,retrans=5,x-systemd.automount,x-systemd.idle-timeout=600"
     nfs_mounts:
       - src: "192.168.10.103:/services"
         path: "/mnt/backup/services"
       - src: "192.168.10.103:/infrastructure"
         path: "/mnt/backup/infrastructure"
-
-    restic_cache_dir: "/var/cache/restic/nas"
-    restic_password_file: "/etc/restic/password"
-    backup_retention_daily: 7
     
-    backup_nfs_mount_opts: "nfsvers=4.0,_netdev,noatime,hard,timeo=600,retrans=5,x-systemd.automount,x-systemd.idle-timeout=600"
+  ## Timer Related
+    backup_on_calendar: "*-*-* 02:00:00"
+    backup_randomized_delay_sec: 600
+
+  ## Service Related
+    backup_run_user: "root"
+    backup_script_path: "/usr/local/bin/{{ backup_service_name }}-backup.sh"
+
+  ## Script Related
+    restic_password_file: "/etc/restic/password"
+    restic_cache_dir: "/var/cache/restic/nas"
+    backup_retention_daily: 7
 
 
   tasks:
@@ -59,15 +72,22 @@
         group: root
         mode: "0700"
 
-    - name: Check restic password file exists
-      stat:
-        path: "{{ restic_password_file }}"
-      register: restic_password_file_check
+    - name: Ensure /etc/restic directory exists
+      file:
+        path: /etc/restic
+        state: directory
+        owner: root
+        group: root
+        mode: "0700"
 
-    - name: Fail if restic password file is missing
-      fail:
-        msg: "Restic password file {{ restic_password_file }} does not exist. Create it manually before continuing."
-      when: not restic_password_file_check.stat.exists
+    - name: Deploy restic password file from Ansible Vault
+      copy:
+        dest: "{{ restic_password_file }}"
+        content: "{{ gdrive_rclone_restic_backup_pw }}\n"
+        owner: root
+        group: root
+        mode: "0600"
+      no_log: true
 
     - name: Ensure root rclone config directory exists
       file:
@@ -76,3 +96,28 @@
         owner: root
         group: root
         mode: "0700"
+
+    - name: Deploy backup script from template
+      template:
+        src: backup.sh.j2
+        dest: "{{ backup_script_path }}"
+        owner: root
+        group: root
+        mode: "0700"
+      no_log: true
+
+    - name: Deploy systemd backup service from template
+      template:
+        src: backup.service.j2
+        dest: "/etc/systemd/system/{{ backup_service_name }}-backup.service"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Deploy systemd backup timer from template
+      template:
+        src: backup.timer.j2
+        dest: "/etc/systemd/system/{{ backup_service_name }}-backup.timer"
+        owner: root
+        group: root
+        mode: "0644"
