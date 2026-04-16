@@ -7,7 +7,7 @@ Wants=network-online.target
 Type=oneshot
 User={{ backup_run_user }}
 ExecStart={{ backup_script_path }}
-ExecStartPre=/usr/bin/test -d {{ restic_repo }}
+
 
 [Install]
 WantedBy=multi-user.target
