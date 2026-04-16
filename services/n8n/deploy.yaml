@@ -1,0 +1,55 @@
+---
+- name: Deploy secure n8n on ai-02
+  hosts: ai-02
+  become: true
+
+  vars:
+    n8n_base_dir: /opt/services/n8n
+    n8n_env_file: "{{ n8n_base_dir }}/.env"
+    n8n_compose_file: "{{ n8n_base_dir }}/compose.yaml"
+
+  tasks:
+    - name: Ensure n8n base directory exists
+      ansible.builtin.file:
+        path: "{{ n8n_base_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0750"
+
+    - name: Copy n8n env file
+      ansible.builtin.copy:
+        src: .env
+        dest: "{{ n8n_env_file }}"
+        owner: root
+        group: root
+        mode: "0600"
+      notify: Restart n8n
+
+    - name: Copy n8n compose file
+      ansible.builtin.copy:
+        src: compose.yaml
+        dest: "{{ n8n_compose_file }}"
+        owner: root
+        group: root
+        mode: "0640"
+      notify: Restart n8n
+
+    - name: Ensure n8n Docker volume exists
+      community.docker.docker_volume:
+        name: n8n_data
+        state: present
+
+    - name: Deploy n8n stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ n8n_base_dir }}"
+        state: present
+        pull: always
+
+  handlers:
+    - name: Restart n8n
+      community.docker.docker_compose_v2:
+        project_src: "{{ n8n_base_dir }}"
+        state: present
+        pull: always
+        recreate: always
