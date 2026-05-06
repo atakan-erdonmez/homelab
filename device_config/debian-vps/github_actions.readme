@@ -1,0 +1,3 @@
+Since Blog-Page repo needs to push newly created files to VPS, it requires SSH access.
+
+For this, I created a restricted user (deploy-bot). I created a key pair, and put the public key in the VPS, giving the private key to GitHub.

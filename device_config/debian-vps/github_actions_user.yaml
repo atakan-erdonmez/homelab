@@ -1,0 +1,52 @@
+---
+- name: Setup restricted user for Astro blog, Github Actions
+  hosts: debian-vps
+  become: true
+  vars:
+    deploy_user: "deploy-bot"
+    web_root: "/var/www/astro-blog"
+    # Replace this with your actual public key string or a path to the file
+    ssh_public_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEg3JzZK1zmB6Q/J7XWP34TSWoa48Z3NK8dDPEz1EZl2 github_actions_blog_deploy_key"
+
+  tasks:
+    - name: Ensure the deploy-bot group exists
+      ansible.builtin.group:
+        name: "{{ deploy_user }}"
+        state: present
+
+    - name: Create the deploy-bot user
+      ansible.builtin.user:
+        name: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        shell: /bin/bash
+        create_home: true
+        state: present
+
+    - name: Ensure the .ssh directory exists
+      ansible.builtin.file:
+        path: "/home/{{ deploy_user }}/.ssh"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: '0700'
+
+    - name: Add the public key to authorized_keys
+      ansible.builtin.authorized_key:
+        user: "{{ deploy_user }}"
+        state: present
+        key: "{{ ssh_public_key }}"
+
+    - name: Ensure the web directory exists
+      ansible.builtin.file:
+        path: "{{ web_root }}"
+        state: directory
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        mode: '0755'
+
+    - name: Set ownership of the web directory to deploy-bot
+      ansible.builtin.file:
+        path: "{{ web_root }}"
+        owner: "{{ deploy_user }}"
+        group: "{{ deploy_user }}"
+        recurse: true
