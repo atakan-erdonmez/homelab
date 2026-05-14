@@ -11,44 +11,38 @@
   tasks:
     - name: Ensure directories exist
       file: 
-        path: "{{ base_dir }}" 
+        path: "{{ item }}" 
         state: directory
         mode: '0755'
         owner: root
         group: root
-
+      loop:
+        - "{{ base_dir }}"
+        - "{{ base_dir }}/conf.d"
 
     - name: Copy Docker Compose file
       copy:
-        src: ./docker-compose.yaml
-        dest: "{{ base_dir }}/docker-compose.yaml"
+        src: ./compose.yaml
+        dest: "{{ base_dir }}/compose.yaml"
 
+    - name: Copy Base Nginx Config
+      copy:
+        src: ./nginx.conf
+        dest: "{{ base_dir }}/nginx.conf"
 
     - name: Update & run Nginx proxy
       import_tasks: tasks/nginx_proxy.yaml
       tags: nginx_proxy
 
-
     - name: Pull and start the Docker containers
       community.docker.docker_compose_v2:
         project_src: "{{ base_dir }}"
+        files:
+          - compose.yaml
         state: present
         pull: always
         recreate: always
 
-
-
   handlers:
-    - name: Restart cloudflared
-      service:
-        name: cloudflared
-        state: restarted
-
     - name: Reload nginx
-      service:
-        name: nginx
-        state: reloaded
-    
-    - name: Reload systemd daemon
-      systemd:
-        daemon_reload: yes
+      shell: "docker exec nginx-proxy nginx -s reload"

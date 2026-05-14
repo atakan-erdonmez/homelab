@@ -1,0 +1,81 @@
+# Managed by Ansible - Changes will be overwritten
+# Supported Tags in vars/services.yaml:
+# - name:           (Required) Internal identifier
+# - domain:         (Required) Public server_name
+# - ip:             (Required) Backend IP address
+# - port:           (Required) Backend port
+# - protocol:       http | https (Default: http)
+# - ssl_verify:     on | off (Default: off) - Used when protocol is https
+# - websockets:     true | false (Default: false) - Enables Upgrade/Connection headers
+# - large_buffers:  true | false (Default: false) - 256k buffers for heavy JS (QNAP)
+# - long_timeouts:  true | false (Default: false) - 600s timeouts (OpenClaw/AI)
+# - proxy_redirect: string | "off" - Custom rewrite of Location/Refresh headers
+# - max_body_size:  string (Default: 50M) - client_max_body_size
+
+server {
+    listen 8080;
+    server_name {{ item.domain }};
+
+    # 1. Payload Management
+    client_max_body_size {{ item.max_body_size | default('50M') }};
+
+    {% if item.large_buffers | default(false) %}
+    # Performance: Large buffers for heavy JS bundles (e.g. QTS)
+    proxy_buffers 4 256k;
+    proxy_buffer_size 128k;
+    {% endif %}
+
+    # 2. Global Security Headers (Management Hardening)
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    {% if item.large_buffers | default(false) %}
+    add_header Content-Security-Policy "upgrade-insecure-requests";
+    {% endif %}
+
+    location / {
+        # 3. Dynamic Protocol & Backend Routing
+        proxy_pass {{ item.protocol | default('http') }}://{{ item.ip }}:{{ item.port }};
+
+        {% if item.ssl_verify | default('off') == 'off' and item.protocol | default('http') == 'https' %}
+        # Allow self-signed certificates for internal management nodes
+        proxy_ssl_verify off;
+        {% endif %}
+
+        {% if item.proxy_redirect is defined %}
+        proxy_redirect {{ item.proxy_redirect }};
+        {% endif %}
+
+        # 4. Identity & Protocol Transparency
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+        proxy_set_header Origin $http_origin;
+
+        {% if item.websockets | default(false) %}
+        # 5. High-Performance Persistent Pipe (WebSockets/SSE)
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_buffering off;
+        {% if item.long_timeouts | default(false) %}
+        # Extended timeouts for long-running processes (e.g. AI Thinking)
+        proxy_read_timeout 600s;
+        proxy_send_timeout 600s;
+        proxy_connect_timeout 600s;
+        {% else %}
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+        proxy_connect_timeout 60s;
+        {% endif %}
+        {% else %}
+        # 6. Standard Web Buffer Settings
+        proxy_buffering on;
+        proxy_read_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_connect_timeout 60s;
+        {% endif %}
+    }
+}

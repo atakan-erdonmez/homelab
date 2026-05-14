@@ -6,13 +6,11 @@
   notify: Reload nginx
   register: nginx_config_sync
 
-- name: Validate Nginx Configuration
-  command: nginx -t
+- name: Validate Nginx Configuration (via one-off container)
+  command: >
+    docker run --rm 
+    -v {{ base_dir }}/nginx.conf:/etc/nginx/nginx.conf:ro 
+    -v {{ base_dir }}/conf.d:/etc/nginx/conf.d:ro 
+    nginx:alpine nginx -t
   when: nginx_config_sync.changed
   changed_when: false
-
-- name: Ensure Nginx are started
-  service:
-    name: nginx
-    state: started
-    enabled: yes

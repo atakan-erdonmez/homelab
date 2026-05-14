@@ -1,0 +1,8 @@
+services:
+  - name: server1
+    domain: server1.domain.com
+    ip: PRIVATE_IPR
+    port: 8080
+    protocol: https
+    ssl_verify: off
+    websockets: true
