@@ -1,0 +1,48 @@
+# Managed by Ansible - Changes will be overwritten
+server {
+    listen 8080;
+    server_name {{ item.domain }};
+
+    # 1. Payload Management
+    client_max_body_size {{ item.max_body_size | default('50M') }};
+
+    # 2. Global Security Headers (Management Hardening)
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    location / {
+        # 3. Dynamic Protocol & Backend Routing
+        proxy_pass {{ item.protocol | default('http') }}://{{ item.ip }}:{{ item.port }};
+
+        {% if item.protocol | default('http') == 'https' %}
+        # Allow self-signed certificates for internal management nodes
+        proxy_ssl_verify off;
+        {% endif %}
+
+        # 4. Identity & Protocol Transparency
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+        proxy_set_header Origin $http_origin;
+
+        {% if item.websockets | default(false) %}
+        # 5. High-Performance Persistent Pipe (WebSockets/SSE)
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+
+        proxy_buffering off;
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+        {% else %}
+        # 6. Standard Web Buffer Settings
+        proxy_buffering on;
+        proxy_read_timeout 60s;
+        proxy_send_timeout 60s;
+        {% endif %}
+
+        proxy_connect_timeout 60s;
+    }
+}

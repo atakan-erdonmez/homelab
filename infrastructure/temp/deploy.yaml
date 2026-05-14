@@ -1,0 +1,54 @@
+---
+- name: Deploy Mgmt-Proxy Gateway
+  hosts: mgmt_proxy
+  become: true
+  vars_files:
+    - vars/services.yaml
+  vars:
+    cloudflared_token: "{{ lookup('env', 'CLOUDFLARED_TOKEN') }}"
+    base_dir: "/opt/services/management-proxy"
+
+  tasks:
+    - name: Ensure directories exist
+      file: 
+        path: "{{ base_dir }}" 
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+
+
+    - name: Copy Docker Compose file
+      copy:
+        src: ./docker-compose.yaml
+        dest: "{{ base_dir }}/docker-compose.yaml"
+
+
+    - name: Update & run Nginx proxy
+      import_tasks: tasks/nginx_proxy.yaml
+      tags: nginx_proxy
+
+
+    - name: Pull and start the Docker containers
+      community.docker.docker_compose_v2:
+        project_src: "{{ base_dir }}"
+        state: present
+        pull: always
+        recreate: always
+
+
+
+  handlers:
+    - name: Restart cloudflared
+      service:
+        name: cloudflared
+        state: restarted
+
+    - name: Reload nginx
+      service:
+        name: nginx
+        state: reloaded
+    
+    - name: Reload systemd daemon
+      systemd:
+        daemon_reload: yes

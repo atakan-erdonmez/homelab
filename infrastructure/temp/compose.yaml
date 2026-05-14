@@ -1,0 +1,24 @@
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARED_TOKEN}
+    network_mode: host
+
+  nginx-proxy:
+    image: nginx:alpine
+    container_name: nginx-proxy
+    read_only: true
+    user: "101:101"
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro 
+    depends_on:
+      - cloudflared
+    tmpfs: 
+      - /var/cache/nginx:uid=101,gid=101
+      - /var/run:uid=101,gid=101
+      - /tmp:uid=101,gid=101

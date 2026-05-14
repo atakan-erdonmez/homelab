@@ -18,3 +18,9 @@ services:
     ip: 192.168.20.50
     port: 1234
     websockets: no
+
+  - name: dev01-web
+    domain: dev01-web.atakan-erdonmez.com
+    ip: 192.168.20.64
+    port: 8080
+    websockets: no   
