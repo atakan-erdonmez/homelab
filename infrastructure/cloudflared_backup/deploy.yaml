@@ -7,6 +7,7 @@
   become: true
   vars:
     base_dir: "/opt/services/cloudflared-backup"
+    cloudflared_token: "{{ lookup('env', 'CLOUDFLARED_TOKEN') }}"
 
   tasks:
     - name: Ensure directories exist
@@ -18,12 +19,6 @@
         group: root
 
     
-    - name: Copy Production Environment file
-      copy:
-        src: ./.env
-        dest: "{{ base_dir }}/.env"
-        mode: '0600' # Strict permissions for the actual token
-
 
     - name: Copy Docker Compose file
       copy:
