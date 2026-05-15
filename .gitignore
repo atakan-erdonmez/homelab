@@ -9,3 +9,4 @@ ansible/inventory.ini
 ansible/group_vars/all/secrets.yaml
 ansible/.ansible_vault_pass
 infrastructure/mgmt_proxy/vars/services.yaml
+infrastructure/app_proxy/vars/services.yaml
