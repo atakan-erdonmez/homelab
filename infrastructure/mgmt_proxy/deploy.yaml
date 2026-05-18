@@ -5,7 +5,7 @@
   vars_files:
     - vars/services.yaml
   vars:
-    cloudflared_token: "{{ lookup('env', 'CLOUDFLARED_TOKEN') }}"
+    cloudflared_token: "{{ lookup('ini', 'CLOUDFLARED_TOKEN type=properties file=.env') }}"
     base_dir: "/opt/services/management-proxy"
 
   tasks:
@@ -20,8 +20,8 @@
         - "{{ base_dir }}"
         - "{{ base_dir }}/conf.d"
 
-    - name: Copy Docker Compose file
-      copy:
+    - name: Copy Docker Compose file, using the new .env method. Checkout "getting variable from .env without copying" in kb
+      template:
         src: ./compose.yaml
         dest: "{{ base_dir }}/compose.yaml"
 

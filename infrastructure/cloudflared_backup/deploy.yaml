@@ -3,11 +3,11 @@
   # When I add a new service to the nginx config, I re-deploy with ansible.
   # Since it restarts both containers, including cloudflared, if something is wrong with nginx config, tunnel will go down.
   # To prevent this, I am using this tunnel to have uninterrupted access
-  hosts: rasp
+  hosts: mgmt_proxy
   become: true
   vars:
     base_dir: "/opt/services/cloudflared-backup"
-    cloudflared_token: "{{ lookup('env', 'CLOUDFLARED_TOKEN') }}"
+    cloudflared_token: "{{ lookup('ini', 'CLOUDFLARED_TOKEN type=properties file=.env') }}"
 
   tasks:
     - name: Ensure directories exist
@@ -20,8 +20,8 @@
 
     
 
-    - name: Copy Docker Compose file
-      copy:
+    - name: Copy Docker Compose file using 'template' for injecting the token
+      template:
         src: ./compose.yaml
         dest: "{{ base_dir }}/compose.yaml"
 
