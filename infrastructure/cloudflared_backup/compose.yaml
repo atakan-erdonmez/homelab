@@ -4,3 +4,4 @@ services:
     container_name: cloudflared-backup
     restart: unless-stopped
     command: tunnel --no-autoupdate run --token {{ cloudflared_token }}
+    network_mode: host
