@@ -1,6 +1,8 @@
 # 🛡️ Zero Trust Reverse Proxy Deployment
 This is a reverse proxy solution to access my homelab remotely & securely over the internet. 
 
+Full blog post can be read [here](https://github.com/atakan-erdonmez/homelab/tree/main/infrastructure/app_proxy).
+
 # ⚙️ Architecture & Design
 ```mermaid
 graph LR

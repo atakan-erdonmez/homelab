@@ -2,6 +2,7 @@
 
 A secure reverse-proxy for accessing locally hosted services and apps over Internet.
 
+Full blog post can be read [here](https://github.com/atakan-erdonmez/homelab/tree/main/infrastructure/app_proxy).
 
 # ⚙️ Architecture & Design
 This solution is hosted within a dedicated Proxmox LXC container (Debian). It consists of a native installation of the Cloudflared tunnel and an Nginx reverse proxy.
