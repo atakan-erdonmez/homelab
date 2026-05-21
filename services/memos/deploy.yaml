@@ -1,0 +1,50 @@
+---
+- name: Deploy memos on DebianDocker
+  hosts: debiandocker
+  become: true
+
+  vars:
+    base_dir: "/opt/services/memos"
+    nfs_server: "192.168.10.103"
+    nfs_path: "/services/memos"
+    mount_point: "/mnt/services/memos"
+    restic_password: "{{ memos_restic_backup_pw }}"
+
+  vars_files:
+  - "group_vars/all/secrets.yaml"
+
+  tasks:
+    - name: Ensure base directory exists
+      ansible.builtin.file:
+        path: "{{ base_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0750"
+
+    - name: Ensure data directory exists
+      ansible.builtin.file:
+        path: "{{ base_dir }}/data"
+        state: directory
+        owner: root
+        group: root
+        mode: "0750"
+
+    - name: Copy compose file
+      ansible.builtin.copy:
+        src: compose.yaml
+        dest: "{{ base_dir }}/compose.yaml"
+        owner: root
+        group: root
+        mode: "0640"
+
+
+    - name: Deploy stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ base_dir }}"
+        state: present
+        pull: always
+
+    - name: Configure restic backup for memos
+      ansible.builtin.include_role:
+        name: restic_backup

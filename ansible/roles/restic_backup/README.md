@@ -14,7 +14,7 @@ Deploys Restic-based backups for service data stored on NFS.
 - `base_dir: "/opt/services/<service>`
 - `nfs_server: "192.168.10.103"`
 - `nfs_path: "/services/<service>"`
-- `mount_point: "/mnt/services/freshrss"`
+- `mount_point: "/mnt/services/<service>"`
 - `restic_password: "{{ <service>_restic_backup_pw }}"`
 
 
@@ -37,7 +37,17 @@ These can be explicitly specified in the playbook if needed.
 
 ## Example use in playbook
 
+At the end of the tasks, add this as the last task:
+
 ```
-roles:
-  - restic_backup
+- name: Configure restic backup for <service>
+      ansible.builtin.include_role:
+        name: restic_backup
+```
+
+At the start of the file, add this below vars:
+
+```
+  vars_files:
+  - "group_vars/all/secrets.yaml"
 ```
