@@ -1,0 +1,68 @@
+---
+- name: Deploy blinko on DebianDocker
+  hosts: debiandocker
+  become: true
+
+  vars:
+    base_dir: "/opt/services/blinko"
+    nfs_server: "192.168.10.103"
+    nfs_path: "/services/blinko"
+    mount_point: "/mnt/services/blinko"
+    restic_password: "{{ blinko_restic_backup_pw }}"
+
+  vars_files:
+    - "group_vars/all/secrets.yaml"
+
+  tasks:
+    - name: Ensure base directory exists
+      ansible.builtin.file:
+        path: "{{ base_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0750"
+
+    - name: Ensure data directories exist
+      ansible.builtin.file:
+        path: "{{ base_dir }}/{{ item }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0750"
+      loop:
+        - "data"
+        - "data/db"
+        - "data/blinko"
+
+    - name: Copy compose file
+      ansible.builtin.copy:
+        src: compose.yaml
+        dest: "{{ base_dir }}/compose.yaml"
+        owner: root
+        group: root
+        mode: "0640"
+
+    - name: Generate & copy .env file
+      ansible.builtin.template:
+        src: .env.j2
+        dest: "{{ base_dir }}/.env"
+        owner: root
+        group: root
+        mode: "0600"
+      notify: Restart application container
+
+    - name: Deploy stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ base_dir }}"
+        state: present
+        pull: always
+
+    - name: Configure restic backup for blinko
+      ansible.builtin.include_role:
+        name: restic_backup
+        
+  handlers:
+    - name: Restart application container
+      community.docker.docker_compose_v2:
+        project_src: "{{ base_dir }}"
+        state: restarted

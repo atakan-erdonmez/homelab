@@ -1,0 +1,67 @@
+name: blinko-stack
+
+services:
+
+  blinko-website:
+    image: blinkospace/blinko:latest
+    container_name: blinko-website
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      NEXTAUTH_URL: ${NEXTAUTH_URL}
+      NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    volumes:
+      # Local bind mount for application data
+      - ./data/blinko:/app/.blinko
+
+    ports:
+      - 1111:1111
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:1111/"]
+      interval: 30s 
+      timeout: 10s   
+      retries: 5     
+      start_period: 30s 
+
+    networks:
+      - blinko-network
+
+  postgres:
+    image: postgres:14-alpine
+    container_name: blinko-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      TZ: ${SYSTEM_TZ:-UTC}
+
+    volumes:
+      # Local bind mount for database persistence
+      - ./data/db:/var/lib/postgresql/data
+      
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - blinko-network
+
+networks:
+  blinko-network:
+    driver: bridge
