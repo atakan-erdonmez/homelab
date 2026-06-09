@@ -1,0 +1,30 @@
+alerting:
+  telegram:
+    token: ${TELEGRAM_TOKEN}
+    id: ${TELEGRAM_ID}
+
+endpoints:
+  - name: atakan-erdonmez
+    url: "https://atakan-erdonmez.com"
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type: telegram
+        failure-threshold: 2
+        send-on-resolved: true
+        success-threshold: 2
+        minimum-reminder-interval: 10m
+
+
+  - name: knowledge_base
+    url: "https://knowledgebase.atakan-erdonmez.com"
+    interval: 1m
+    conditions:
+      - "[STATUS] == 200"
+    alerts:
+      - type : telegram
+        failure-threshold: 2
+        send-on-resolved: true
+        success-threshold: 2
+        minimum-reminder-interval: 10m

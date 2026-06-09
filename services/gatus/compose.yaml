@@ -1,0 +1,10 @@
+services:
+  gatus:
+    image: ghcr.io/twin/gatus:stable
+    container_name: gatus
+    restart: unless-stopped
+    user: "1000:1000"
+    ports:
+      - 8080:8080
+    volumes:
+      - ./config:/config
