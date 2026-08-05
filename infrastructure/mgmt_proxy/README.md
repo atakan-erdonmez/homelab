@@ -73,3 +73,8 @@ To further harden this deployment, the following features are ~~planned~~ done:
 1. Update `nginx.conf` file according to your endpoints
 2. Deploy to your desired endpoint with:
     `ansible-playbook deploy.yaml`
+
+### Granular Updates (Using Tags)
+To optimize deployment time, use tags to target specific layers of the stack:
+
+Update Nginx config & proxy only: `ansible-playbook deploy.yaml --tags nginx_proxy`

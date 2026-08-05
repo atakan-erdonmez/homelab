@@ -30,6 +30,10 @@
         src: ./nginx.conf
         dest: "{{ base_dir }}/nginx.conf"
 
+    - name: Copy the test nginx config for testing purposes on test.atakan-erdonmez.com
+      copy: 
+        src: ./test.conf 
+        dest: "{{ base_dir}}/conf.d/test.conf"
     - name: Update & run Nginx proxy
       import_tasks: tasks/nginx_proxy.yaml
       tags: nginx_proxy
