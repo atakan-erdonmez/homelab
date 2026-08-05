@@ -1,0 +1,57 @@
+---
+- name: Deploy gatus on VPS
+  hosts: debian-vps
+  become: true
+
+  vars:
+    base_dir: "/opt/services/gatus"
+
+
+  tasks:
+    - name: Ensure base directory exists
+      ansible.builtin.file:
+        path: "{{ base_dir }}"
+        state: directory
+        owner: "1000"
+        group: "1000"
+        mode: "0750"
+
+    - name: Ensure config directory exists
+      ansible.builtin.file:
+        path: "{{ base_dir }}/config"
+        state: directory
+        owner: "1000"
+        group: "1000"
+        mode: "0750"
+
+    - name: Copy compose file
+      ansible.builtin.copy:
+        src: compose.yaml
+        dest: "{{ base_dir }}/compose.yaml"
+        owner: "1000"
+        group: "1000"
+        mode: "0640"
+
+    - name: Generate & copy .env file
+      ansible.builtin.template:
+        src: .env.j2
+        dest: "{{ base_dir }}/.env"
+        owner: "1000"
+        group: "1000"
+        mode: "0600" # Industry standard for protecting secrets on disk
+
+
+    - name: Generate & copy config file
+      ansible.builtin.template:
+        src: config.yaml.j2
+        dest: "{{ base_dir }}/config/config.yaml"
+        owner: "1000"
+        group: "1000"
+        mode: "0600" # Industry standard for protecting secrets on disk
+
+  
+    - name: Deploy stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ base_dir }}"
+        state: present
+        pull: always
