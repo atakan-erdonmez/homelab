@@ -1,0 +1,17 @@
+tried bastion host, LXC/VM entry point, direct tailscale etc
+
+decided on router with wireguard to VPS
+
+steps
+-----
+1- wireguard debian setup applied as same
+    used network 10.50.0.0/24, 10.50.0.1 being the VPS itself
+
+2- did the router os setup
+
+
+3- on the VPS, i added the VLAN subnet as allowed IPs.:
+    AllowedIPs = 10.50.0.2/32, 192.168.10.0/24, 192.168.20.0/24, 192.168.30.0/24, 192.168.40.0/24
+    restart
+    sudo wg-quick down wg0
+sudo wg-quick up wg0    

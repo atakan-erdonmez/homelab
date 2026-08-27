@@ -9,13 +9,13 @@ services:
 
   - name: kavita
     domain: kavita.atakan-erdonmez.com
-    ip: 192.168.20.50
+    ip: debiandocker
     port: 5000
     websockets: yes
 
   - name: freshrss
     domain: rss.atakan-erdonmez.com
-    ip: 192.168.20.50
+    ip: debiandocker
     port: 1234
     websockets: no
 
@@ -27,18 +27,18 @@ services:
 
   - name: gatus
     domain: gatus.atakan-erdonmez.com
-    ip: 192.168.20.50
+    ip: debiandocker
     port: 8080
     websockets: no   
 
   - name: memos
     domain: memos.atakan-erdonmez.com
-    ip: 192.168.20.50
+    ip: debiandocker
     port: 5230   
     websockets: no
 
   - name: blinko
     domain: blinko.atakan-erdonmez.com
-    ip: 192.168.20.50
+    ip: debiandocker
     port: 1111
     websockets: no 

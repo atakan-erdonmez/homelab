@@ -97,3 +97,7 @@ Update Nginx installation only: `ansible-playbook deploy.yaml --tags nginx_insta
 Update Nginx config & proxy only: `ansible-playbook deploy.yaml --tags nginx_proxy`
 
 Provision Cloudflare only: `ansible-playbook deploy.yaml --tags infra`
+
+
+## To-do list
+- **Remove Old Configs**: When there is an entry deleted from the services, the config file should be deleted automatically.
