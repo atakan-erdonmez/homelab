@@ -48,7 +48,9 @@
       command: >
         pvesm set {{ storage_id }} 
         --content backup,images,rootdir,vztmpl,iso 
-        --prune-backups keep-last=5
+        --prune-backups keep-last=3
+        --is_mountpoint 1
+      # 'is_mountpoint 1' make sure that if nas-proxmox isn't mounted, jobs will give error
       when: storage_check.rc == 0
 
     - name: Prevent I/O errors by setting local vzdump temp directory

@@ -33,6 +33,6 @@ mount -a
 - Add directory & configure parameters:
 ```
 pvesm add dir nas-proxmox --path /mnt/nas-proxmox --content backup,images,rootdir,vztmpl,iso
-pvesm set nas-proxmox --content backup,images,rootdir,vztmpl,iso --prune-backups keep-last=5
+pvesm set nas-proxmox --content backup,images,rootdir,vztmpl,iso --prune-backups keep-last=3 --is_mountpoint 1
 ```
 - Add the 'tmpdir: /var/tmp' entry in the `/etc/vzdump.conf` file.
