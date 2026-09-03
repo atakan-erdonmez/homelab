@@ -1,6 +1,6 @@
 ---
-- name: Deploy blinko on DebianDocker
-  hosts: debiandocker
+- name: Deploy blinko on app01
+  hosts: app01
   become: true
 
   vars:

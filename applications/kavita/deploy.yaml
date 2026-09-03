@@ -1,6 +1,6 @@
 ---
 - name: Deploy Kavita for e-book server
-  hosts: debiandocker
+  hosts: app01
   become: true
   vars_files:
     - "group_vars/all/secrets.yaml"

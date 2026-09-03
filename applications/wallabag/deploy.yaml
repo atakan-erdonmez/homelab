@@ -1,17 +1,18 @@
 ---
-- name: Deploy gatus on app01 to check VPS
+- name: Deploy wallabag on app01
   hosts: app01
   become: true
 
   vars:
-    base_dir: "/opt/services/gatus"
+    base_dir: "/opt/services/wallabag"
     nfs_server: "192.168.10.103"
-    nfs_path: "/services/gatus"
-    mount_point: "/mnt/services/gatus"
-    restic_password: "{{ gatus_restic_backup_pw }}"
+    nfs_path: "/services/wallabag"
+    mount_point: "/mnt/services/wallabag"
+    restic_password: "{{ wallabag_restic_backup_pw }}"
 
   vars_files:
   - "group_vars/all/secrets.yaml"
+
 
   tasks:
     - name: Ensure base directory exists
@@ -22,13 +23,18 @@
         group: "1000"
         mode: "0750"
 
-    - name: Ensure config directory exists
+    - name: Ensure app data directories exist with nobody ownership
       ansible.builtin.file:
-        path: "{{ base_dir }}/config"
+        path: "{{ base_dir }}/{{ item }}"
         state: directory
-        owner: "1000"
-        group: "1000"
-        mode: "0750"
+        owner: "65534"
+        group: "65534"
+        mode: "0775"
+      loop:
+        - data
+        - images
+
+
 
     - name: Copy compose file
       ansible.builtin.copy:
@@ -47,14 +53,6 @@
         mode: "0600" # Industry standard for protecting secrets on disk
 
 
-    - name: Generate & copy config file
-      ansible.builtin.template:
-        src: config.yaml.j2
-        dest: "{{ base_dir }}/config/config.yaml"
-        owner: "1000"
-        group: "1000"
-        mode: "0600" # Industry standard for protecting secrets on disk
-
   
     - name: Deploy stack
       community.docker.docker_compose_v2:
@@ -62,6 +60,7 @@
         state: present
         pull: always
 
-    - name: Configure restic backup for gatus
+
+    - name: Configure restic backup for wallabag
       ansible.builtin.include_role:
         name: restic_backup

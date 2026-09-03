@@ -4,7 +4,7 @@ A containerized deployment of the Kavita e-book reader & library, integrated wit
 
 # ⚙️ Architecture & Design
 
-This service is hosted on a dedicated Debian VM (**debiandocker**) within the Proxmox cluster. It leverages a hybrid storage model where application logic remains local to the compute node, while the library data and backup repository reside on a centralized QNAP NAS.
+This service is hosted on a dedicated Debian VM (**app01**) within the Proxmox cluster. It leverages a hybrid storage model where application logic remains local to the compute node, while the library data and backup repository reside on a centralized QNAP NAS.
 
 The solution is designed with a "Safety-First" mentality, ensuring that even if the compute node fails, the entire application state and library can be recovered from the NAS.
 
@@ -28,7 +28,7 @@ Plaintext
 homelab/
 ├── ansible.cfg              # Global settings (Points to vault_pass.txt)
 ├── ansible/
-│   ├── inventory.ini        # Defines [debiandocker] host
+│   ├── inventory.ini        # Defines [app01] host
 │   └── group_vars/all/
 │       └── secrets.yaml     # Encrypted Restic/Kavita credentials
 └── services/kavita/         # <--- You are here

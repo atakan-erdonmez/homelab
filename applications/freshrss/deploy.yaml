@@ -1,6 +1,6 @@
 ---
-- name: Deploy FreshRSS on DebianDocker VM using Docker
-  hosts: debiandocker
+- name: Deploy FreshRSS on app01 VM using Docker
+  hosts: app01
   become: true
   vars:
     base_dir: "/opt/services/freshrss"

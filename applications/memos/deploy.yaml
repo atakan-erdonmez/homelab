@@ -1,6 +1,6 @@
 ---
-- name: Deploy memos on DebianDocker
-  hosts: debiandocker
+- name: Deploy memos on app01
+  hosts: app01
   become: true
 
   vars:

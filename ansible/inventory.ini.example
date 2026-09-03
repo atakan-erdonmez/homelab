@@ -7,7 +7,7 @@ server2 ansible_host=x.x.x.x ansible_user=root
 
 
 [vms]
-debiandocker ansible_host=x.x.x.x ansible_user=your_user
+app01 ansible_host=x.x.x.x ansible_user=your_user
 gateway ansible_host=x.x.x.x ansible_user=your_user
 
 [all_servers:children]

@@ -1,5 +1,5 @@
 ---
-- name: Deploy gatus on VPS
+- name: Deploy gatus on VPS to check homelab
   hosts: debian-vps
   become: true
 

@@ -1,0 +1,12 @@
+services:
+  wallabag:
+    image: wallabag/wallabag:latest
+    container_name: wallabag
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8989:80"
+    volumes:
+      - ./data:/var/www/wallabag/data
+      - ./images:/var/www/wallabag/web/assets/images

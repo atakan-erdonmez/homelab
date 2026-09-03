@@ -4,7 +4,7 @@ A lightweight, containerized FreshRSS deployment using Ansible and Docker, desig
 
 # ⚙️ Architecture & Design
 
-This service runs on a Debian VM (**debiandocker**) inside the Proxmox cluster.
+This service runs on a Debian VM (**app01**) inside the Proxmox cluster.
 The setup is intentionally minimal, focusing on reliability and low operational overhead.
 
 ## Core Components
