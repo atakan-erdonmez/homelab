@@ -10,6 +10,10 @@
         icon: proxmox.png
         href: http://pve02.int.atakan-erdonmez.com:8006/
         description: Proxmox node 2
+    - pve03:
+        icon: proxmox.png
+        href: http://pve03.int.atakan-erdonmez.com:8006/
+        description: Proxmox node 3
     - Raspberry Pi:
         icon: raspberry-pi.png
         href: http://raspberrypi.int.atakan-erdonmez.com/
@@ -32,6 +36,11 @@
         icon: homepage.png
         href: http://localhost/
         description: Homepage is 😎
+    - Gatus:
+        icon: gatus.png
+        href: http://192.168.20.63:8080/
+        description: Check uptime of website & VPS
+
 
 - Apps:
     - Memos:
