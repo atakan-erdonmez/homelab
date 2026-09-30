@@ -1,6 +1,6 @@
 ---
 - name: Configure Proxmox Directory Storage via NAS Mount
-  hosts: optiplex1
+  hosts: pve03
   become: true
   vars:
     nas_ip: "192.168.10.103"

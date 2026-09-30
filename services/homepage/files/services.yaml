@@ -1,0 +1,92 @@
+# For configuration options and examples, please see:
+# https://gethomepage.dev/configs/services/
+
+- Infrastructure:
+    - pve01:
+        icon: proxmox.png
+        href: http://pve01.int.atakan-erdonmez.com:8006/
+        description: Proxmox node 1
+    - pve02:
+        icon: proxmox.png
+        href: http://pve02.int.atakan-erdonmez.com:8006/
+        description: Proxmox node 2
+    - Raspberry Pi:
+        icon: raspberry-pi.png
+        href: http://raspberrypi.int.atakan-erdonmez.com/
+        description: Brain & control node
+    - NAS:
+        icon: qnap.png
+        href: http://nas.int.atakan-erdonmez.com:8080/
+        description: NAS
+    - MikroTik Router:
+        icon: mikrotik.png
+        href: http://router.int.atakan-erdonmez.com/
+        description: Router
+    - Managed Switch:
+        icon: tp-link
+        href: http://192.168.10.5
+        description: Main managed switch
+
+- Services:
+    - My Third Service:
+        icon: homepage.png
+        href: http://localhost/
+        description: Homepage is 😎
+
+- Apps:
+    - Memos:
+        icon: memos.png
+        href: http://memos.atakan-erdonmez.com/
+        description: Note taking
+    - n8n:
+        icon: n8n.png
+        href: http://n8n.atakan-erdonmez.com/
+        description: AI & automation
+    - Kavita:
+        icon: kavita.png
+        href: http://kavita.atakan-erdonmez.com/
+        description: E-book archive
+    - FreshRSS:
+        icon: freshrss.png
+        href: http://rss.atakan-erdonmez.com/
+        description: RSS feed
+    - Blinko:
+        icon: mdi-notebook-edit-outline
+        href: http://Blinko.atakan-erdonmez.com/
+        description: Note taking
+    - Wallabag:
+        icon: wallabag.png
+        href: http://Wallabag.atakan-erdonmez.com/
+        description: To-read
+
+- Arr Stack:
+    - Jellyfin:
+        icon: jellyfin
+        href: http://192.168.30.198:8096
+    - qBittorrent:
+        icon: qbittorrent
+        href: http://192.168.30.198:8080
+    - prowlarr:
+        icon: prowlarr
+        href: http://192.168.30.198:9696
+        description: Indexer
+    - radarr:
+        icon: radarr
+        href: http://192.168.30.198:7878
+        description: Movie organizer
+    - sonarr:
+        icon: sonarr
+        href: http://192.168.30.198:8989
+        description: Series organizer
+    - flaresolverr:
+        icon: flaresolverr
+        href: http://192.168.30.198:8191
+        description: For bypassing Cloudflare
+    - seerr:
+        icon: seerr
+        href: http://192.168.30.198:5055
+        description: For requesting media
+    - bazarr:
+        icon: bazarr
+        href: http://192.168.30.198:6767
+        description: For subtitle management
