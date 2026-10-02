@@ -1,0 +1,56 @@
+---
+- name: Deploy monitoring stack on svc01
+  hosts: svc01
+  become: true
+  vars:
+    monitoring_dir: /opt/services/monitoring
+    prometheus_data_dir: "{{ monitoring_dir }}/prometheus/data"
+    grafana_data_dir: "{{ monitoring_dir }}/grafana/data"
+
+  tasks:
+    - name: Ensure monitoring base directory exists
+      ansible.builtin.file:
+        path: "{{ monitoring_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Ensure Prometheus data directory exists with correct permissions
+      ansible.builtin.file:
+        path: "{{ prometheus_data_dir }}"
+        state: directory
+        owner: "65534"
+        group: "65534"
+        mode: "0775"
+
+    - name: Ensure Grafana data directory exists with correct permissions
+      ansible.builtin.file:
+        path: "{{ grafana_data_dir }}"
+        state: directory
+        owner: "472"
+        group: "472"
+        mode: "0775"
+
+    - name: Deploy compose file
+      ansible.builtin.copy:
+        src: compose.yaml
+        dest: "{{ monitoring_dir }}/compose.yaml"
+        mode: "0644"
+
+    - name: Deploy prometheus.yml
+      ansible.builtin.template:
+        src: prometheus/prometheus.yml.j2
+        dest: "{{ monitoring_dir }}/prometheus.yml"
+        mode: "0644"
+      notify: Restart Prometheus
+
+
+    - name: Ensure monitoring is running
+      community.docker.docker_compose_v2:
+        project_src: "{{ monitoring_dir }}"
+        state: present
+
+  handlers:
+    - name: Restart Prometheus
+      community.docker.docker_container:
+        name: prometheus
+        restart: true

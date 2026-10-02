@@ -1,0 +1,4 @@
+---
+collections:
+  - name: prometheus.prometheus
+  # this file is for installing prometheus role using ansible-galaxy & node exporter

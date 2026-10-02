@@ -1,0 +1,7 @@
+---
+- name: Install Node Exporter
+  hosts: optiplex1
+  become: true
+
+  roles:
+    - prometheus.prometheus.node_exporter
