@@ -43,14 +43,15 @@
         mode: "0644"
       notify: Restart Prometheus
 
-
     - name: Ensure monitoring is running
       community.docker.docker_compose_v2:
         project_src: "{{ monitoring_dir }}"
         state: present
+
 
   handlers:
     - name: Restart Prometheus
       community.docker.docker_container:
         name: prometheus
         restart: true
+

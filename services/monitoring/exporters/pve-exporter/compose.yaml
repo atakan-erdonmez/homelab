@@ -1,0 +1,17 @@
+services:
+  pve-exporter:
+    image: prompve/prometheus-pve-exporter:3.8.1
+    container_name: pve-exporter
+    env_file:
+      - .env  
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+    networks:
+      - monitoring
+
+networks:
+  monitoring:
+    external: true

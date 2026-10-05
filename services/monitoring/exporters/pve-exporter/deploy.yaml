@@ -1,0 +1,41 @@
+---
+- name: Deploy pve-exporter on svc01 for Monitoring stack
+  hosts: svc01
+  become: true
+
+  vars:
+    monitoring_dir: /opt/services/monitoring
+    pve_exporter_dir: "{{ monitoring_dir }}/exporters/pve-exporter"
+
+
+  tasks:
+    - name: Create pve-exporter directory
+      ansible.builtin.file:
+        path: "{{ pve_exporter_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Deploy .env for pve-exporter
+      ansible.builtin.template:
+        src: .env.j2
+        dest: "{{ pve_exporter_dir }}/.env"
+        mode: "0600"
+      notify: Restart pve-exporter
+
+    - name: Deploy compose file
+      ansible.builtin.copy:
+        src: compose.yaml
+        dest: "{{ pve_exporter_dir }}/compose.yaml"
+        mode: "0644"
+
+
+    - name: Ensure pve-exporter container is running
+      community.docker.docker_compose_v2:
+        project_src: "{{ pve_exporter_dir }}"
+        state: present
+
+  handlers:
+    - name: Restart pve-exporter
+      community.docker.docker_container:
+        name: pve-exporter
+        restart: true
