@@ -5,8 +5,17 @@ scrape_configs:
   - job_name: "pve01-node"
     static_configs:
       - targets:
-          - 'pve01.int.atakan-erdonmez.com:9100'
+        - 'pve01.int.atakan-erdonmez.com:9100'
 
+  - job_name: "pve02-node"
+    static_configs:
+      - targets:
+        - 'pve02.int.atakan-erdonmez.com:9100'
+
+  - job_name: "pve03-node"
+    static_configs:
+      - targets:
+        - 'pve03.int.atakan-erdonmez.com:9100'
 
   - job_name: "PVE exporter"
     metrics_path: /pve

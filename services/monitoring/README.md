@@ -17,5 +17,8 @@ follow guide: https://www.nxsi.io/blog/proxmox-monitoring-grafana-guide
 
 
 
+# For deploy.yaml:
+run `ansible-playbook deploy.yaml --tags prometheus_config` for updating prometheus config only
+
 
 run ansible playbook to install prom, grafana, and pve-exporter

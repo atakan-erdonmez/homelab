@@ -32,29 +32,21 @@
         description: Main managed switch
 
 - Services:
-    - My Third Service:
-        icon: homepage.png
-        href: http://localhost/
-        description: Homepage is 😎
     - Gatus:
         icon: gatus.png
         href: http://192.168.20.63:8080/
         description: Check uptime of website & VPS
+    - Prometheus:
+        icon: prometheus.png
+        href: http://192.168.20.63:9090
+        description: Monitoring engine
+    - Grafana:
+        icon: grafana.png
+        href: http://192.168.20.63:3100
+        description: Monitoring dashboard
 
 
 - Apps:
-    - Memos:
-        icon: memos.png
-        href: http://memos.atakan-erdonmez.com/
-        description: Note taking
-    - n8n:
-        icon: n8n.png
-        href: http://n8n.atakan-erdonmez.com/
-        description: AI & automation
-    - Kavita:
-        icon: kavita.png
-        href: http://kavita.atakan-erdonmez.com/
-        description: E-book archive
     - FreshRSS:
         icon: freshrss.png
         href: http://rss.atakan-erdonmez.com/
@@ -67,6 +59,20 @@
         icon: wallabag.png
         href: http://Wallabag.atakan-erdonmez.com/
         description: To-read
+    - Memos:
+        icon: memos.png
+        href: http://memos.atakan-erdonmez.com/
+        description: Note taking
+    - n8n:
+        icon: n8n.png
+        href: http://n8n.atakan-erdonmez.com/
+        description: AI & automation
+    - Kavita:
+        icon: kavita.png
+        href: http://kavita.atakan-erdonmez.com/
+        description: E-book archive
+
+
 
 - Arr Stack:
     - Jellyfin:

@@ -42,6 +42,7 @@
         dest: "{{ monitoring_dir }}/prometheus.yml"
         mode: "0644"
       notify: Restart Prometheus
+      tags: prometheus_config
 
     - name: Ensure monitoring is running
       community.docker.docker_compose_v2:

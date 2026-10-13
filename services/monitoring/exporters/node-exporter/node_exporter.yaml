@@ -1,7 +1,19 @@
 ---
 - name: Install Node Exporter
-  hosts: optiplex1
+  hosts: "{{ target }}"
   become: true
 
+  pre_tasks:
+    - name: Ensure /usr/local/bin exists
+      ansible.builtin.file:
+        path: /usr/local/bin
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      # This is for an error I got in a specific node, where /usr/local/bin didn't exist
   roles:
     - prometheus.prometheus.node_exporter
+
+
+# Run with `ansible-playbook node_exporter.yaml --target=pve03
