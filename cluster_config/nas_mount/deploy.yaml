@@ -1,0 +1,51 @@
+---
+# Recreates the cluster-wide NFS storage for the QNAP NAS.
+# Runs on one node only: /etc/pve/storage.cfg is shared, so the change applies to the whole cluster.
+#
+# Usage:
+#   ansible-playbook proxmox-nas-storage.yml
+#
+# Note: this removes the storage DEFINITION only. Data on the NAS is not touched.
+
+- name: Configure NAS NFS storage in the Proxmox cluster
+  hosts: pve01
+  become: true
+  gather_facts: false
+
+  vars:
+    storage_id: nas-proxmox
+    nas_server: 192.168.10.103
+    nas_export: /infrastructure/proxmox
+    nas_content: backup,iso,vztmpl
+    nas_options: vers=4.0
+    nas_prune_backups: keep-last=3
+
+  tasks:
+    - name: Check if a storage with this ID already exists
+      ansible.builtin.command: 
+        cmd: "grep -qE '^[a-z]+: {{ storage_id }}$' /etc/pve/storage.cfg"
+      register: storage_check
+      changed_when: false
+      failed_when: storage_check.rc not in [0, 1]
+
+    - name: Remove the old storage definition
+      ansible.builtin.command: pvesm remove {{ storage_id }}
+      when: storage_check.rc == 0
+
+    - name: Add the new NFS storage
+      ansible.builtin.command: >
+        pvesm add nfs {{ storage_id }}
+        --server {{ nas_server }}
+        --export {{ nas_export }}
+        --content {{ nas_content }}
+        --options {{ nas_options }}
+        --prune-backups {{ nas_prune_backups }}
+
+    - name: Show storage status
+      ansible.builtin.command: pvesm status --storage {{ storage_id }}
+      register: storage_status
+      changed_when: false
+
+    - name: Print storage status
+      ansible.builtin.debug:
+        var: storage_status.stdout_lines

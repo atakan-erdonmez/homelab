@@ -1,0 +1,67 @@
+---
+- name: Install and enable systemd-resolved on the VPS
+  hosts: debian-vps
+  become: true
+
+  vars:
+    # Upstream DNS for everything that is NOT *.int.atakan-erdonmez.com.
+    # Set to [] if DHCP already provides working DNS servers.
+    resolved_upstream_dns:
+      - 1.1.1.1
+      - 9.9.9.9
+
+  tasks:
+
+    - name: Install systemd-resolved
+      ansible.builtin.apt:
+        name: systemd-resolved
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Create resolved drop-in directory
+      ansible.builtin.file:
+        path: /etc/systemd/resolved.conf.d
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Set upstream DNS servers
+      ansible.builtin.copy:
+        dest: /etc/systemd/resolved.conf.d/10-upstream.conf
+        content: |
+          [Resolve]
+          DNS={{ resolved_upstream_dns | join(' ') }}
+        owner: root
+        group: root
+        mode: "0644"
+      when: resolved_upstream_dns | length > 0
+      notify: Restart systemd-resolved
+
+    - name: Enable and (re)start systemd-resolved
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        enabled: true
+        state: restarted
+
+    - name: Point /etc/resolv.conf to the systemd-resolved stub
+      ansible.builtin.file:
+        src: /run/systemd/resolve/stub-resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true
+
+    # - name: Verify that DNS resolution works
+    #   ansible.builtin.command: resolvectl query debian.org
+    #   register: dns_test
+    #   changed_when: false
+    #   retries: 3
+    #   delay: 2
+    #   until: dns_test.rc == 0
+
+  handlers:
+    - name: Restart systemd-resolved
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        state: restarted

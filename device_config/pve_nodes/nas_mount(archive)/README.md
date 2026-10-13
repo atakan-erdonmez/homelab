@@ -1,5 +1,7 @@
 # Mount NAS to Proxmox Nodes
 
+This method is not used anymore. Instead, check homelab/cluster_config/nas_mount.
+
 This deployment mounts my NAS into Proxmox nodes using NFS. 
 
 I am directly editing config files and using Proxmox commands instead of using Proxmox GUI. This is because when I use GUI for mounting, even the parameters are the same, the NAS gives input/output error.
