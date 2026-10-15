@@ -6,6 +6,7 @@
 ## Specific files
 tools/devices.json
 ansible/inventory.ini
+ansible/inventory.yaml
 ansible/.ansible_vault_pass
 infrastructure/mgmt_proxy/vars/services.yaml
 infrastructure/app_proxy/vars/services.yaml
