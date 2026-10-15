@@ -3,7 +3,7 @@
 services:
   - name: n8n
     domain: n8n.atakan-erdonmez.com
-    ip: 192.168.20.55
+    ip: 192.168.30.200
     port: 5678
     websockets: true
 
