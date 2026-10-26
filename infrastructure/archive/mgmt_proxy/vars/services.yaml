@@ -1,0 +1,34 @@
+# This is a list of apps/services that are behind the management proxy
+
+services:
+  - name: proxmox01
+    domain: pve01-lab.atakan-erdonmez.com
+    ip: 192.168.10.101
+    port: 8006
+    protocol: https
+    ssl_verify: off
+    websockets: true
+
+  - name: proxmox02
+    domain: pve02-lab.atakan-erdonmez.com
+    ip: 192.168.10.102
+    port: 8006
+    protocol: https
+    ssl_verify: off
+    websockets: true
+
+  - name: mikrotik
+    domain: router-lab.atakan-erdonmez.com
+    ip: 192.168.10.1
+    port: 80
+    websockets: false
+
+  - name: qnap
+    domain: nas-lab.atakan-erdonmez.com
+    ip: 192.168.10.103
+    port: 8080
+    websockets: true
+    large_buffers: true
+    hide_origin: true
+    proxy_redirect: "http://192.168.10.103:8080/ /"
+
