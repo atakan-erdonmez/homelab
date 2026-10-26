@@ -77,31 +77,31 @@
 - Arr Stack:
     - Jellyfin:
         icon: jellyfin
-        href: http://192.168.30.198:8096
+        href: http://mediaserver.int.atakan-erdonmez.com:8096
     - qBittorrent:
         icon: qbittorrent
-        href: http://192.168.30.198:8080
+        href: http://mediaserver.int.atakan-erdonmez.com:8080
     - prowlarr:
         icon: prowlarr
-        href: http://192.168.30.198:9696
+        href: http://mediaserver.int.atakan-erdonmez.com:9696
         description: Indexer
     - radarr:
         icon: radarr
-        href: http://192.168.30.198:7878
+        href: http://mediaserver.int.atakan-erdonmez.com:7878
         description: Movie organizer
     - sonarr:
         icon: sonarr
-        href: http://192.168.30.198:8989
+        href: http://mediaserver.int.atakan-erdonmez.com:8989
         description: Series organizer
     - flaresolverr:
         icon: flaresolverr
-        href: http://192.168.30.198:8191
+        href: http://mediaserver.int.atakan-erdonmez.com:8191
         description: For bypassing Cloudflare
     - seerr:
         icon: seerr
-        href: http://192.168.30.198:5055
+        href: http://mediaserver.int.atakan-erdonmez.com:5055
         description: For requesting media
     - bazarr:
         icon: bazarr
-        href: http://192.168.30.198:6767
+        href: http://mediaserver.int.atakan-erdonmez.com:6767
         description: For subtitle management

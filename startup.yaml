@@ -1,0 +1,84 @@
+---
+# Base setup for all Debian 13 VMs
+# Run: ansible-playbook -i inventory base.yml
+- name: Base configuration for Debian 13 hosts
+  hosts: mediaserver
+  become: true
+
+  vars:
+    base_domain: int.atakan-erdonmez.com
+    base_dns_servers:
+      - 192.168.10.1          # <-- CHANGE: your single DNS server (MikroTik)
+    base_timezone: Europe/Istanbul
+
+  tasks:
+    # ---------- DNS / search domain / LLMNR+mDNS hardening ----------
+    - name: Install systemd-resolved and timesyncd
+      ansible.builtin.apt:
+        name:
+          - systemd-resolved
+          - systemd-timesyncd
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Create resolved drop-in directory
+      ansible.builtin.file:
+        path: /etc/systemd/resolved.conf.d
+        state: directory
+        mode: "0755"
+
+    - name: Configure DNS server, search domain, disable LLMNR and mDNS
+      ansible.builtin.copy:
+        dest: /etc/systemd/resolved.conf.d/10-base.conf
+        mode: "0644"
+        content: |
+          [Resolve]
+          DNS={{ base_dns_servers | join(' ') }}
+          Domains={{ base_domain }}
+          LLMNR=no
+          MulticastDNS=no
+      notify: Restart systemd-resolved
+
+    - name: Enable and start systemd-resolved
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        enabled: true
+        state: started
+
+    - name: Point /etc/resolv.conf to the resolved stub
+      ansible.builtin.file:
+        src: /run/systemd/resolve/stub-resolv.conf
+        dest: /etc/resolv.conf
+        state: link
+        force: true
+
+    # ---------- Time ----------
+    - name: Set timezone
+      community.general.timezone:
+        name: "{{ base_timezone }}"
+
+    - name: Enable and start NTP (systemd-timesyncd)
+      ansible.builtin.systemd:
+        name: systemd-timesyncd
+        enabled: true
+        state: started
+
+    # ---------- QEMU guest agent (only on KVM/QEMU guests) ----------
+    - name: Install qemu-guest-agent
+      ansible.builtin.apt:
+        name: qemu-guest-agent
+        state: present
+      when: ansible_virtualization_type in ['kvm', 'qemu']
+
+    - name: Start qemu-guest-agent
+      ansible.builtin.systemd:
+        name: qemu-guest-agent
+        state: started
+      when: ansible_virtualization_type in ['kvm', 'qemu']
+
+  handlers:
+    - name: Restart systemd-resolved
+      ansible.builtin.systemd:
+        name: systemd-resolved
+        state: restarted
