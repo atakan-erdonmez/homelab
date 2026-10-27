@@ -7,8 +7,6 @@
 
   vars:
     base_domain: int.atakan-erdonmez.com
-    base_dns_servers:
-      - 192.168.10.1          # <-- CHANGE: your single DNS server (MikroTik)
     base_timezone: Europe/Istanbul
 
   tasks:
@@ -34,7 +32,6 @@
         mode: "0644"
         content: |
           [Resolve]
-          DNS={{ base_dns_servers | join(' ') }}
           Domains={{ base_domain }}
           LLMNR=no
           MulticastDNS=no

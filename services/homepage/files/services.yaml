@@ -44,6 +44,10 @@
         icon: grafana.png
         href: http://192.168.20.63:3100
         description: Monitoring dashboard
+    - Proxmox Backup Server:
+        href: http://192.168.10.51:8007
+        description: On backup02
+        icon: proxmox.png
 
 
 - Apps:
