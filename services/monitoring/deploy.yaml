@@ -6,6 +6,7 @@
     monitoring_dir: /opt/services/monitoring
     prometheus_data_dir: "{{ monitoring_dir }}/prometheus/data"
     grafana_data_dir: "{{ monitoring_dir }}/grafana/data"
+    prometheus_targets_dir: "{{ monitoring_dir }}/prometheus/targets"
 
   tasks:
     - name: Ensure monitoring base directory exists
@@ -44,6 +45,23 @@
       notify: Restart Prometheus
       tags: prometheus_config
 
+
+
+    - name: Ensure Prometheus targets directory exists
+      ansible.builtin.file:
+        path: "{{ prometheus_targets_dir }}"
+        state: directory
+        mode: "0755"
+
+    - name: Deploy Prometheus file_sd targets
+      ansible.builtin.copy:
+        src: prometheus/targets/vms.yml
+        dest: "{{ prometheus_targets_dir }}/vms.yml"
+        mode: "0644"
+      tags: prometheus_config
+
+
+      
     - name: Ensure monitoring is running
       community.docker.docker_compose_v2:
         project_src: "{{ monitoring_dir }}"

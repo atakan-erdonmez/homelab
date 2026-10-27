@@ -1,13 +1,27 @@
 ---
 # Base setup for all Debian 13 VMs
 # Run: ansible-playbook -i inventory base.yml
+
 - name: Base configuration for Debian 13 hosts
-  hosts: mediaserver
+  hosts: vms
   become: true
 
   vars:
     base_domain: int.atakan-erdonmez.com
     base_timezone: Europe/Istanbul
+
+  pre_tasks:
+    - name: Ensure /usr/local/bin exists
+      ansible.builtin.file:
+        path: /usr/local/bin
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+      # Required by prometheus.prometheus.node_exporter
+
+  roles:
+    - prometheus.prometheus.node_exporter
 
   tasks:
     # ---------- DNS / search domain / LLMNR+mDNS hardening ----------
@@ -26,7 +40,7 @@
         state: directory
         mode: "0755"
 
-    - name: Configure DNS server, search domain, disable LLMNR and mDNS
+    - name: Configure search domain, disable LLMNR and mDNS
       ansible.builtin.copy:
         dest: /etc/systemd/resolved.conf.d/10-base.conf
         mode: "0644"
@@ -61,7 +75,7 @@
         enabled: true
         state: started
 
-    # ---------- QEMU guest agent (only on KVM/QEMU guests) ----------
+    # ---------- QEMU guest agent ----------
     - name: Install qemu-guest-agent
       ansible.builtin.apt:
         name: qemu-guest-agent

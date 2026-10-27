@@ -1,0 +1,10 @@
+- targets:
+    - ai01.int.atakan-erdonmez.com:9100
+    - ai02.int.atakan-erdonmez.com:9100
+    - app01.int.atakan-erdonmez.com:9100
+    - backup01.int.atakan-erdonmez.com:9100
+    - backup02.int.atakan-erdonmez.com:9100
+    - dev01.int.atakan-erdonmez.com:9100
+    - lab01.int.atakan-erdonmez.com:9100
+    - mediaserver.int.atakan-erdonmez.com:9100
+    - svc01.int.atakan-erdonmez.com:9100

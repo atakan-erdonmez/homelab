@@ -8,7 +8,11 @@ scrape_configs:
         - 'pve01.int.atakan-erdonmez.com:9100'
         - 'pve02.int.atakan-erdonmez.com:9100'
         - 'pve03.int.atakan-erdonmez.com:9100'
-
+        
+  - job_name: "vms"
+    file_sd_configs:
+      - files:
+          - /etc/prometheus/targets/vms.yml
 
   - job_name: "PVE exporter"
     metrics_path: /pve
