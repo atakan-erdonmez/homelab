@@ -1,6 +1,6 @@
 ---
 - name: Install Node Exporter
-  hosts: "{{ target }}"
+  hosts: raspberrypi
   become: true
 
   pre_tasks:
