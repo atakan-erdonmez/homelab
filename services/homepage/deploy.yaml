@@ -28,6 +28,12 @@
         dest: "{{ homepage_config_dir }}/services.yaml"
         mode: "0644"
 
+    - name: Deploy bookmarks.yaml
+      ansible.builtin.copy:
+        src: files/bookmarks.yaml
+        dest: "{{ homepage_config_dir }}/bookmarks.yaml"
+        mode: "0644"
+
     - name: Ensure Homepage is running
       community.docker.docker_compose_v2:
         project_src: "{{ homepage_dir }}"
