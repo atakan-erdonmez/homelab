@@ -1,0 +1,6 @@
+[Unit]
+Description=Mount Proxmox Backup datastore
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/mount /mnt/proxmox_backup

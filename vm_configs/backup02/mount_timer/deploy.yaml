@@ -1,0 +1,37 @@
+---
+- name: Configure Proxmox backup mount timer
+  hosts: backup02
+  become: true
+
+  tasks:
+    - name: Copy mount service
+      ansible.builtin.copy:
+        src: proxmox-backup-mount.service
+        dest: /etc/systemd/system/proxmox-backup-mount.service
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload systemd
+
+    - name: Copy mount timer
+      ansible.builtin.copy:
+        src: proxmox-backup-mount.timer
+        dest: /etc/systemd/system/proxmox-backup-mount.timer
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload systemd
+
+    - name: Apply systemd changes
+      ansible.builtin.meta: flush_handlers
+
+    - name: Enable and start mount timer
+      ansible.builtin.systemd_service:
+        name: proxmox-backup-mount.timer
+        enabled: true
+        state: started
+
+  handlers:
+    - name: Reload systemd
+      ansible.builtin.systemd_service:
+        daemon_reload: true

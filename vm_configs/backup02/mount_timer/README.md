@@ -1,0 +1,1 @@
+This deployment enables systemd timer for mounting the NAS at 07:20 every day for PBS backup.

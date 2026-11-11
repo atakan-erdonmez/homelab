@@ -1,0 +1,9 @@
+[Unit]
+Description=Mount Proxmox Backup datastore daily at 07:20
+
+[Timer]
+OnCalendar=*-*-* 07:20:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
