@@ -22,7 +22,7 @@ services:
 
   - name: gatus
     domain: gatus.atakan-erdonmez.com
-    ip: app01
+    ip: svc01
     port: 8080
     websockets: no   
 

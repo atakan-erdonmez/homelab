@@ -1,6 +1,6 @@
 ---
 - name: Deploy App-Proxy Gateway
-  hosts: app_proxy
+  hosts: gateway # aka app_proxy
   become: true
   vars_files:
     - vars/services.yaml
